@@ -8,7 +8,7 @@ const port = 3000;
 
 // Middleware para permitir CORS
 app.use(cors({
-  origin: 'http://localhost:4200', 
+  origin: [ 'http://localhost:4200' , 'http://192.168.100.151:4200/rastreio'], 
   methods: 'GET',
   allowedHeaders: 'Content-Type,Authorization'
 }));
@@ -16,10 +16,16 @@ app.use(cors({
 // Middleware para permitir JSON no corpo da requisição
 app.use(express.json());
 
+
 app.get('/api/pedido/:cpf_cnpj', async (req, res) => {
   try {
-    const cpf_cnpj = req.params.cpf_cnpj.trim(); // Remove espaços em branco
+    let cpf_cnpj = req.params.cpf_cnpj.trim(); // Remove espaços em branco
 
+    cpf_cnpj = cpf_cnpj.length <= 11
+        ? cpf_cnpj.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
+        : cpf_cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+
+    console.log(cpf_cnpj)
     const result = await sequelize.query(
       `SELECT ns.chavenfe,
           ns.marketplace_pedido,
@@ -33,7 +39,7 @@ app.get('/api/pedido/:cpf_cnpj', async (req, res) => {
         JOIN cliente c ON c.id_cliente = ns.id_cliente
         JOIN nota_saida_itens nsi ON ns.id_nota_saida = nsi.id_nota_saida   
         JOIN produto p ON p.id_produto = nsi.id_produto 
-        WHERE (c.cpf = :cpf_cnpj OR ns.intelipost_order = :cpf_cnpj)
+        WHERE (c.cpf = :cpf_cnpj OR ns.intelipost_order = :cpf_cnpj OR c.cnpj = :cpf_cnpj)
         AND ns.chavenfe <> ''
         AND LOWER(ns.marketplace_pedido) NOT LIKE '%!_%' ESCAPE '!'`, // Define '!' como escape
       {
