@@ -1,0 +1,13 @@
+services:
+  - name: rastreio_fid_back
+    type: web
+    runtime: node
+    repo: https://github.com/AnnaLutw/rastreia_pedido-back-end
+    region: oregon  # Ou outro disponível
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 22.13.1
+      - key: PORT
+        value: 10000
