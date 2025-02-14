@@ -10,7 +10,7 @@ const port = process.env.PORT || 3000
 
 // Middleware para permitir CORS
 app.use(cors({
-  origin: ['http://localhost:4200', 'http://192.168.100.151:4200/rastreio'],
+  origin: '*',
   methods: 'GET',
   allowedHeaders: 'Content-Type,Authorization'
 }));
