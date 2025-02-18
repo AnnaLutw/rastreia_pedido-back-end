@@ -42,7 +42,7 @@ app.get('/api/pedido/:cpf_cnpj', async (req, res) => {
           ns.intelipost_order as codigo_rastreio,
         CASE 
             WHEN ns.parceiro = 'FIDCOMERCIOEXTERIOREIRELI' THEN 'Mercado Livre' 
-            WHEN ns.parceiro LIKE '%WAPSTORE%' THEN 'Fid Comex Site' 
+            WHEN ns.parceiro LIKE '%WAP%' THEN 'Fid Comex Site' 
             WHEN ns.parceiro = 'CASAS BAHIA MARKETPLACE' THEN 'Casas Bahia' 
             WHEN ns.parceiro = 'MAGAZINE LUIZA' THEN 'Magazine Luiza' 
             WHEN ns.parceiro = 'LEROY MERLIN' THEN 'Leroy Merlin' 
@@ -56,7 +56,9 @@ app.get('/api/pedido/:cpf_cnpj', async (req, res) => {
         JOIN produto p ON p.id_produto = nsi.id_produto 
         WHERE (c.cpf = :cpf_cnpj OR ns.intelipost_order = :cpf_cnpj OR c.cnpj = :cpf_cnpj)
         AND ns.chavenfe <> ''
-        AND LOWER(ns.marketplace_pedido) NOT LIKE '%!_%' ESCAPE '!'`,
+        AND LOWER(ns.marketplace_pedido) NOT LIKE '%!_%' ESCAPE '!'
+        AND LOWER(ns.marketplace_pedido) NOT LIKE '%RE' ESCAPE '!'
+        ORDER BY ns.data_emissao DESC`, 
       {
         type: Sequelize.QueryTypes.SELECT,
         replacements: { cpf_cnpj: cpf_cnpj }
