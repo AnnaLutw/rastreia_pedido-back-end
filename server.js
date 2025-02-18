@@ -39,7 +39,17 @@ app.get('/api/pedido/:cpf_cnpj', async (req, res) => {
           ns.id_nr_nf,
           p.descricao_fiscal,
           p.imagem1,
-          ns.intelipost_order as codigo_rastreio
+          ns.intelipost_order as codigo_rastreio,
+        CASE 
+            WHEN ns.parceiro = 'FIDCOMERCIOEXTERIOREIRELI' THEN 'Mercado Livre' 
+            WHEN ns.parceiro LIKE '%WAPSTORE%' THEN 'Fid Comex Site' 
+            WHEN ns.parceiro = 'CASAS BAHIA MARKETPLACE' THEN 'Casas Bahia' 
+            WHEN ns.parceiro = 'MAGAZINE LUIZA' THEN 'Magazine Luiza' 
+            WHEN ns.parceiro = 'LEROY MERLIN' THEN 'Leroy Merlin' 
+            WHEN ns.parceiro = 'LOJAS AMERICANAS' THEN 'Lojas Americanas' 
+            WHEN ns.parceiro = 'SHOPEE' THEN 'Shopee' 
+            ELSE ns.parceiro 
+        END AS portal
         FROM nota_saida ns
         JOIN cliente c ON c.id_cliente = ns.id_cliente
         JOIN nota_saida_itens nsi ON ns.id_nota_saida = nsi.id_nota_saida   
@@ -61,7 +71,7 @@ app.get('/api/pedido/:cpf_cnpj', async (req, res) => {
 
     // 🔹 2. Agrupar os pedidos por `chavenfe`
     const pedidosAgrupados = result.reduce((acc, item) => {
-      const { chavenfe, marketplace_pedido, data_emissao, transportadora_ecommerce, id_nr_nf, codigo_rastreio, descricao_fiscal, imagem1 } = item;
+      const { chavenfe, marketplace_pedido, data_emissao, transportadora_ecommerce, id_nr_nf, codigo_rastreio, descricao_fiscal, imagem1, portal } = item;
       
       if (!acc[chavenfe]) {
         acc[chavenfe] = {
@@ -71,6 +81,7 @@ app.get('/api/pedido/:cpf_cnpj', async (req, res) => {
           transportadora_ecommerce,
           id_nr_nf,
           codigo_rastreio,
+          portal,
           produtos: []
         };
       }
