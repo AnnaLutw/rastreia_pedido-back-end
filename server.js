@@ -57,7 +57,8 @@ app.get('/api/pedido/:cpf_cnpj', async (req, res) => {
         WHERE (c.cpf = :cpf_cnpj OR ns.intelipost_order = :cpf_cnpj OR c.cnpj = :cpf_cnpj)
         AND ns.chavenfe <> ''
         AND LOWER(ns.marketplace_pedido) NOT LIKE '%!_%' ESCAPE '!'
-        AND LOWER(ns.marketplace_pedido) NOT LIKE '%RE' ESCAPE '!'
+        AND LOWER(ns.marketplace_pedido) NOT LIKE '%RE' ESCAPE '!',
+        and transportadora_ecommerce <> ''
         ORDER BY ns.data_emissao DESC`, 
       {
         type: Sequelize.QueryTypes.SELECT,
