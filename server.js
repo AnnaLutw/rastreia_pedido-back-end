@@ -9,7 +9,7 @@ const app = express();
 const port = process.env.PORT || 3000
 
 app.use((req, res, next) => {
-  const allowedOrigin = "https://fidcomex.up.railway.app/rastreio";
+  const allowedOrigin = "https://fidcomex.up.railway.app";
   
   if (req.headers.origin === allowedOrigin) {
     res.header("Access-Control-Allow-Origin", allowedOrigin);
