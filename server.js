@@ -60,6 +60,7 @@ app.get('/api/pedido/:cpf_cnpj', async (req, res) => {
         JOIN produto p ON p.id_produto = nsi.id_produto 
         WHERE (c.cpf = :cpf_cnpj OR ns.intelipost_order = :cpf_cnpj OR c.cnpj = :cpf_cnpj)
         AND ns.chavenfe <> ''
+        and ns.marketplace_pedido <> ''
         AND LOWER(ns.marketplace_pedido) NOT LIKE '%!_%' ESCAPE '!'
         AND LOWER(ns.marketplace_pedido) NOT LIKE '%RE' ESCAPE '!'
         ORDER BY ns.data_emissao DESC`, 
