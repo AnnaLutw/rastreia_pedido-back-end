@@ -46,7 +46,7 @@ const pedidos_rastreio = async (cpf_cnpj) => {
       replacements: { cpf_cnpj: cpf_cnpj }
     }
   );
-
+  console.log(result)
   if (result.length === 0) {
     return { pedidos: [], message: 'CPF/CNPJ não encontrado' };
   }
@@ -68,7 +68,7 @@ const pedidos_rastreio = async (cpf_cnpj) => {
     }
 
     acc[chavenfe].produtos.push({ descricao_fiscal, imagem1 });
-
+    
     return acc;
   }, {});
 
@@ -93,7 +93,7 @@ const pedidos_rastreio = async (cpf_cnpj) => {
       }
     })
   );
-
+ 
   return pedidosComTracking;
 };
 
