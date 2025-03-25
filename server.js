@@ -42,7 +42,7 @@ app.get('/api/pedido/:cpf_cnpj', async (req, res) => {
 
 
 app.post('/api/webhook', async (req, res) => {
-  console.log(req.body);
+  console.log('body:  ' , req.body);
 
   const { id, contactId, command, message, serviceId } = req.body;
 
@@ -68,8 +68,8 @@ app.post('/api/webhook', async (req, res) => {
           return res.status(400).json({ flag: 'unknown_command', message: 'Comando desconhecido' });
   }
 
-  await enviarTriggerSignal(serviceId, contactId, flag);
-  console.log(response)
+  await enviarTriggerSignal(id, contactId, flag);
+  console.log('response :    ' , response)
   res.status(200).json(response);
 });
 
