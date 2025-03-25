@@ -58,7 +58,7 @@ const validateCnpj = (cnpj) => {
 
 const validaCpfCnpj = async (cpf_cnpj, sequelize) => {
     if (!isValidCpfCnpj(cpf_cnpj)) {
-        return 'cpf_invalid';
+        return { flag: 'cpf_invalid', message: 'CPF/CNPJ inválido' };
     }
 
     const result = await sequelize.query(
@@ -72,7 +72,10 @@ const validaCpfCnpj = async (cpf_cnpj, sequelize) => {
         }
     );
 
-    return result.length === 0 ? 'registro_nao_encontrado' : true;
-};
+    if (result.length === 0) {
+        return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
+    }
 
+    return { flag: 'saved_info_user', message: 'CPF/CNPJ válido e encontrado' };
+};
 module.exports = { validaCpfCnpj };
