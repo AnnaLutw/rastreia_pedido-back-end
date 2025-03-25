@@ -44,7 +44,7 @@ app.get('/api/pedido/:cpf_cnpj', async (req, res) => {
 
 app.post('/api/webhook', (req, res) => {
 
-  console.log(req.bo)
+  console.log(req.body)
 
 
   // if (!evento || !dados || !dados.flag) {
