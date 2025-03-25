@@ -77,18 +77,28 @@ app.post('/api/webhook', async (req, res) => {
 });
 
 
-const enviarTriggerSignal = async (botId, contactId, flag) => {
-  const url = `${process.env.API_URL}/api/v1/bots/${botId}/trigger-signal/${contactId}?flag=${flag}`;
+const axios = require('axios');
 
-  try {
-      const response = await axios.post(url);
-      console.log('Trigger enviado com sucesso:', response.data);
-      return { success: true, data: response.data };
-  } catch (error) {
-      console.error('Erro ao enviar trigger:', error.response?.data || error.message);
-      return { success: false, error: error.response?.data || error.message };
-  }
+const enviarTriggerSignal = async (botId, contactId, flag) => {
+    const token = process.env.TOKEN; // Corrigi para usar a variável correta do ambiente
+
+    const headers = {
+        'Authorization': `Bearer ${token}`, // Correção na interpolação da string
+        'Content-Type': 'application/json' // Garante que a API recebe JSON
+    };
+
+    const url = `${process.env.API_URL}/api/v1/bots/${botId}/trigger-signal/${contactId}?flag=${flag}`;
+
+    try {
+        const response = await axios.post(url, {}, { headers }); // Corrigido para passar {} como corpo e headers corretamente
+        console.log('Trigger enviado com sucesso:', response.data);
+        return { success: true, data: response.data };
+    } catch (error) {
+        console.error('Erro ao enviar trigger:', error.response?.data || error.message);
+        return { success: false, error: error.response?.data || error.message };
+    }
 };
+
 
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
