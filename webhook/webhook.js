@@ -57,15 +57,24 @@ const validateCnpj = (cnpj) => {
 
 
 const validaCpfCnpj = async (cpf_cnpj, sequelize) => {
+    console.log(cpf_cnpj)
     if (!isValidCpfCnpj(cpf_cnpj)) {
         return { flag: 'cpf_invalid', message: 'CPF/CNPJ inválido' };
     }
+
+    cpf_cnpj = cpf_cnpj.trim();
+
+    cpf_cnpj = cpf_cnpj.length <= 11
+      ? cpf_cnpj.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
+      : cpf_cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+
+    console.log(cpf_cnpj)
 
     const result = await sequelize.query(
         `SELECT ns.chavenfe
         FROM nota_saida ns
         JOIN cliente c ON c.id_cliente = ns.id_cliente
-        WHERE (c.cpf = :cpf_cnpj OR ns.intelipost_order = :cpf_cnpj OR c.cnpj = :cpf_cnpj)`,
+        WHERE (c.cpf = :cpf_cnpj OR c.cnpj = :cpf_cnpj)`,
         {
             type: Sequelize.QueryTypes.SELECT,
             replacements: { cpf_cnpj }
