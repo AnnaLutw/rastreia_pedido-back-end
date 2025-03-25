@@ -42,11 +42,14 @@ app.get('/api/pedido/:cpf_cnpj', async (req, res) => {
 
 
 app.post('/api/webhook', async (req, res) => {
+  console.log(req.body)
+
   const { id, contactId, command, message } = req.body;
+
+
   if (!contactId || !command || !message?.text) {
       return res.status(400).json({ flag: 'error', message: 'Dados obrigatórios ausentes' });
   }
-  console.log(message)
 
   let response;
   let flag = '';
