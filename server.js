@@ -77,8 +77,6 @@ app.post('/api/webhook', async (req, res) => {
 });
 
 
-const axios = require('axios');
-
 const enviarTriggerSignal = async (botId, contactId, flag) => {
     const token = process.env.TOKEN; // Corrigi para usar a variável correta do ambiente
 
