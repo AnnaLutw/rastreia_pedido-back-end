@@ -5,7 +5,7 @@ const axios = require('axios'); // 📌 Importando Axios para fazer requisiçõe
 const sequelize = require('./database'); // Importa a instância do Sequelize
 require('dotenv').config(); // Carrega variáveis do .env
 const { pedidos_rastreio } = require('./service/rastreio'); // Importa a função de rastreio
-const { webhook } = require('./webhook/webhook'); // Importa a função de rastreio
+const { validaCpfCnpj } = require('./webhook/webhook'); // Importa a função de rastreio
 
 const app = express();
 const port = process.env.PORT || 3000
@@ -45,7 +45,7 @@ app.get('/api/pedido/:cpf_cnpj', async (req, res) => {
 app.post('/api/webhook', async (req, res) => {
   const { event, data } = req.body;
   if (!data) return res.status(400).json({ error: 'Dados obrigatórios.' });
-
+  console.log(data)
   if (data.command === 'validaCpf') {
       const resultado = await validaCpfCnpj(data.message?.text, sequelize);
       return res.status(200).json({
