@@ -42,40 +42,19 @@ app.get('/api/pedido/:cpf_cnpj', async (req, res) => {
 
 
 
-app.post('/api/webhook', (req, res) => {
+app.post('/api/webhook', async (req, res) => {
+  const { event, data } = req.body;
+  if (!data) return res.status(400).json({ error: 'Dados obrigatórios.' });
 
-  console.log(req.body)
+  if (data.command === 'validaCpfCnpj') {
+      const resultado = await validaCpfCnpj(data.message?.text, sequelize);
+      return res.status(200).json({
+          status: resultado === true ? 'success' : resultado,
+          message: resultado === true ? 'CPF/CNPJ válido e encontrado' : 'Erro na validação'
+      });
+  }
 
-
-  // if (!evento || !dados || !dados.flag) {
-  //     return res.status(400).json({ error: 'Evento e flag são obrigatórios.' });
-  // }
-
-  // console.log('Webhook recebido:', req.body);
-
-
-  // switch (dados.command) {
-  //     case 'validaCpfCnpj':
-  //         console.log('Iniciando conversa com o usuário...');
-  //         valida_cpf_cnpj()
-  //         break;
-
-  //     case 'finalizar_atendimento':
-  //         console.log('Finalizando atendimento...');
-  //         // Aqui você pode registrar o encerramento no banco de dados
-  //         break;
-
-  //     case 'enviar_mensagem':
-  //         console.log(`Enviando mensagem: ${dados.mensagem}`);
-  //         // Aqui pode chamar uma API para enviar uma mensagem para o usuário
-  //         break;
-
-  //     default:
-  //         console.log('Flag desconhecida:', dados.flag);
-  //         return res.status(400).json({ error: 'Flag desconhecida' });
-  // }
-
-  res.status(200).json({ success: true, message: 'Webhook processado com sucesso' });
+  res.status(400).json({ error: 'Comando desconhecido' });
 });
 
 
