@@ -57,7 +57,6 @@ app.post('/api/webhook', async (req, res) => {
       case 'validaCpf':
           response = await validaCpfCnpj(message.text, sequelize);
           flag = response.flag;  // Ajustado para pegar a flag corretamente
-          console.log(response);
           break;
 
       case 'InfomarEmail':
@@ -70,7 +69,7 @@ app.post('/api/webhook', async (req, res) => {
   }
 
   await enviarTriggerSignal(serviceId, contactId, flag);
-
+  console.log(response)
   res.status(200).json(response);
 });
 
