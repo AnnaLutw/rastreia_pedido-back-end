@@ -45,33 +45,35 @@ app.get('/api/pedido/:cpf_cnpj', async (req, res) => {
 app.post('/api/webhook', (req, res) => {
 
   console.log(req.bo)
-  if (!evento || !dados || !dados.flag) {
-      return res.status(400).json({ error: 'Evento e flag são obrigatórios.' });
-  }
-
-  console.log('Webhook recebido:', req.body);
 
 
-  switch (dados.command) {
-      case 'validaCpfCnpj':
-          console.log('Iniciando conversa com o usuário...');
-          valida_cpf_cnpj()
-          break;
+  // if (!evento || !dados || !dados.flag) {
+  //     return res.status(400).json({ error: 'Evento e flag são obrigatórios.' });
+  // }
 
-      case 'finalizar_atendimento':
-          console.log('Finalizando atendimento...');
-          // Aqui você pode registrar o encerramento no banco de dados
-          break;
+  // console.log('Webhook recebido:', req.body);
 
-      case 'enviar_mensagem':
-          console.log(`Enviando mensagem: ${dados.mensagem}`);
-          // Aqui pode chamar uma API para enviar uma mensagem para o usuário
-          break;
 
-      default:
-          console.log('Flag desconhecida:', dados.flag);
-          return res.status(400).json({ error: 'Flag desconhecida' });
-  }
+  // switch (dados.command) {
+  //     case 'validaCpfCnpj':
+  //         console.log('Iniciando conversa com o usuário...');
+  //         valida_cpf_cnpj()
+  //         break;
+
+  //     case 'finalizar_atendimento':
+  //         console.log('Finalizando atendimento...');
+  //         // Aqui você pode registrar o encerramento no banco de dados
+  //         break;
+
+  //     case 'enviar_mensagem':
+  //         console.log(`Enviando mensagem: ${dados.mensagem}`);
+  //         // Aqui pode chamar uma API para enviar uma mensagem para o usuário
+  //         break;
+
+  //     default:
+  //         console.log('Flag desconhecida:', dados.flag);
+  //         return res.status(400).json({ error: 'Flag desconhecida' });
+  // }
 
   res.status(200).json({ success: true, message: 'Webhook processado com sucesso' });
 });
