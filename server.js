@@ -46,6 +46,7 @@ app.post('/api/webhook', async (req, res) => {
   if (!contactId || !command || !message?.text) {
       return res.status(400).json({ flag: 'error', message: 'Dados obrigatórios ausentes' });
   }
+  console.log(message)
 
   let response;
   let flag = '';
@@ -54,6 +55,7 @@ app.post('/api/webhook', async (req, res) => {
       case 'validaCpf':
           response = await validaCpfCnpj(message.text, sequelize);
           flag = response.flag;
+          console.log(response)
           break;
       
       case 'InfomarEmail':
