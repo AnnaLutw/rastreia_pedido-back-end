@@ -41,22 +41,52 @@ app.get('/api/pedido/:cpf_cnpj', async (req, res) => {
 });
 
 
-
 app.post('/api/webhook', async (req, res) => {
-  const { event, data } = req.body;
-  if (!data) return res.status(400).json({ error: 'Dados obrigatórios.' });
-  console.log(data)
-  if (data.command === 'validaCpf') {
-      const resultado = await validaCpfCnpj(data.message?.text, sequelize);
-      return res.status(200).json({
-          status: resultado === true ? 'success' : resultado,
-          message: resultado === true ? 'CPF/CNPJ válido e encontrado' : 'Erro na validação'
-      });
+  const { id, contactId, command, message } = req.body;
+  if (!contactId || !command || !message?.text) {
+      return res.status(400).json({ flag: 'error', message: 'Dados obrigatórios ausentes' });
   }
 
-  res.status(400).json({ error: 'Comando desconhecido' });
+  let response;
+  let flag = '';
+
+  switch (command) {
+      case 'validaCpf':
+          response = await validaCpfCnpj(message.text, sequelize);
+          flag = response.flag;
+          break;
+      
+      case 'InfomarEmail':
+          flag = 'put_number_order';
+          response = { flag, message: 'Email recebido e processado' };
+          break;
+
+      default:
+          return res.status(400).json({ flag: 'unknown_command', message: 'Comando desconhecido' });
+  }
+
+  const triggerResponse = await enviarTriggerSignal(id, contactId, flag);
+
+  if (!triggerResponse.success) {
+      return res.status(500).json({ flag: 'error', message: 'Erro ao acionar trigger', details: triggerResponse.error });
+  }
+
+  res.status(200).json({ ...response, trigger: triggerResponse.data });
 });
 
+
+const enviarTriggerSignal = async (botId, contactId, flag) => {
+  const url = `${process.env.API_URL}/api/v1/bots/${botId}/trigger-signal/${contactId}?flag=${flag}`;
+
+  try {
+      const response = await axios.post(url);
+      console.log('Trigger enviado com sucesso:', response.data);
+      return { success: true, data: response.data };
+  } catch (error) {
+      console.error('Erro ao enviar trigger:', error.response?.data || error.message);
+      return { success: false, error: error.response?.data || error.message };
+  }
+};
 
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
