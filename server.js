@@ -44,7 +44,7 @@ app.get('/api/pedido/:cpf_cnpj', async (req, res) => {
 
 app.post('/api/webhook', (req, res) => {
 
-  print(req.bo)
+  console.log(req.bo)
   if (!evento || !dados || !dados.flag) {
       return res.status(400).json({ error: 'Evento e flag são obrigatórios.' });
   }
