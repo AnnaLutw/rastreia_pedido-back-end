@@ -46,7 +46,7 @@ app.post('/api/webhook', async (req, res) => {
   const { event, data } = req.body;
   if (!data) return res.status(400).json({ error: 'Dados obrigatórios.' });
 
-  if (data.command === 'validaCpfCnpj') {
+  if (data.command === 'validaCpf') {
       const resultado = await validaCpfCnpj(data.message?.text, sequelize);
       return res.status(200).json({
           status: resultado === true ? 'success' : resultado,
