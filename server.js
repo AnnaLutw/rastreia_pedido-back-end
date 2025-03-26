@@ -72,6 +72,7 @@ app.post('/api/webhook', async (req, res) => {
 
   await enviarTriggerSignal(serviceId, contactId, flag);
   console.log('response :    ' , response)
+  console.log('message :    ' , message.text)
   res.status(200).json(response);
 });
 
@@ -83,8 +84,6 @@ const enviarTriggerSignal = async (botId, contactId, flag) => {
       'Content-Type': 'application/json'
   };
   const url = `https://fidcomex.digisac.co/api/v1/bots/${botId}/trigger-signal/${contactId}?flag=${flag}`;
-
-  console.log(' url: ' , url)
 
   try {
       const response = await axios.post(url, {}, { headers });
