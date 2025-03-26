@@ -44,8 +44,6 @@ app.get('/api/pedido/:cpf_cnpj', async (req, res) => {
 
 
 app.post('/api/webhook', async (req, res) => {
-  console.log('body:  ' , req.body);
-
   const { data } = req.body;
   const { contactId, command, message, serviceId } = data;
   
@@ -84,8 +82,6 @@ const enviarTriggerSignal = async (botId, contactId, flag) => {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
   };
-  console.log(' url: ' , url_api)
-
   const url = `https://fidcomex.digisac.co/api/v1/bots/${botId}/trigger-signal/${contactId}?flag=${flag}`;
 
   console.log(' url: ' , url)
