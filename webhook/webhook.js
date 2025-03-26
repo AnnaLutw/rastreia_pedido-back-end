@@ -151,7 +151,7 @@ const enviaMensagem = async (msg, contactId) =>{
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.DIGISAC_TOKEN}`
+                'Authorization': `Bearer 9321bfe50f0740a7c8663197e22b79644f80268`
             },
             body: JSON.stringify(requestBody)
         });
