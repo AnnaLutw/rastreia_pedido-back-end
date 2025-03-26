@@ -9,6 +9,8 @@ const { validaCpfCnpj } = require('./webhook/webhook'); // Importa a função de
 
 const app = express();
 const port = process.env.PORT || 3000
+const token = process.env.TOKEN;
+const url_api = process.env.API_URL
 
 app.use((req, res, next) => {
   const allowedOrigin = "https://fidcomex.up.railway.app";
@@ -77,16 +79,14 @@ app.post('/api/webhook', async (req, res) => {
 
 
 const enviarTriggerSignal = async (botId, contactId, flag) => {
-  const token = process.env.TOKEN;
 
   const headers = {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
   };
-  const url_api = process.env.API_URL
   console.log(' url: ' , url_api)
 
-  const url = `https://fidcomex.digisac.co/api/v1/bots/${botId}/trigger-signal/${contactId}?flag=${flag}`;
+  const url = `${url_api}/api/v1/bots/${botId}/trigger-signal/${contactId}?flag=${flag}`;
 
   console.log(' url: ' , url)
 
