@@ -155,7 +155,7 @@ const enviaMensagem = async (msg, contactId) =>{
             },
             body: JSON.stringify(requestBody)
         });
-
+        console.log(response)
         if (!response.ok) {
             throw new Error(`Erro ao enviar rastreamento: ${response.statusText}`);
         }
