@@ -5,7 +5,7 @@ const axios = require('axios'); // 📌 Importando Axios para fazer requisiçõe
 const sequelize = require('./database'); // Importa a instância do Sequelize
 require('dotenv').config(); // Carrega variáveis do .env
 const { pedidos_rastreio } = require('./service/rastreio'); // Importa a função de rastreio
-const { validaCpfCnpj, validaEmailj } = require('./webhook/webhook'); // Importa a função de rastreio
+const { validaCpfCnpj, enviaRastreio } = require('./webhook/webhook'); // Importa a função de rastreio
 
 const app = express();
 const port = process.env.PORT || 3000
@@ -45,9 +45,10 @@ app.get('/api/pedido/:cpf_cnpj', async (req, res) => {
 
 app.post('/api/webhook', async (req, res) => {
   const { data } = req.body;
-  console.log(data)
 
   const { contactId, command, message, serviceId, id } = data;
+  console.log('comando: ',command)
+
   if (!contactId || !command || !message?.text) {
       return res.status(400).json({ flag: 'error', message: 'Dados obrigatórios ausentes' });
   }
@@ -62,28 +63,27 @@ app.post('/api/webhook', async (req, res) => {
           flag = response.flag;  // Ajustado para pegar a flag corretamente
           break;
 
-      // case 'getNumberOrder':
-      //     response = { flag: 'choose_store', message: 'Nenhum registro encontrado' };
-      //     flag = response.flag;  // Ajustado para pegar a flag corretamente
-      //     break;
-
-      // case 'getInfoEmail':
-      //     response = { flag: 'set_number_order', message: 'teste' };
-      //     flag = response.flag;  // Ajustado para pegar a flag corretamente
-      //     break;
-
-      // case 'InfomarEmail':
-      //     flag = 'put_number_order';
-      //     response = { flag, message: 'Email recebido e processado' };
-      //     break;
-
+      case 'enviaUrlRastreio': 
+            response = await enviaRastreio(message.text, sequelize, contactId);
+            flag = response.flag;  // Ajustado para pegar a flag corretamente
+              break;
+      case 'validaPedido':
+            response = await validaPedido(message.text, sequelize, contactId);
+            break;
+      case 'showInformationOrder':
+            response = await enviaRastreio(message.text, sequelize, contactId);
+            flag = 'confirm_order'
+            break;
       default:
           return res.status(400).json({ flag: 'unknown_command', message: 'Comando desconhecido' });
   }
 
+  if(command != 'enviaUrlRastreio'){
+    await enviarTriggerSignal(id, contactId, flag);
+      
+  }
 
 
-  await enviarTriggerSignal(id, contactId, flag);
   console.log('response :    ' , response)
   console.log('message :    ' , message.text)
   res.status(200).json(response);
