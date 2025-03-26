@@ -109,7 +109,7 @@ const enviaRastreio = async (cpf_cnpj, sequelize, contactId) => {
     const rastreioUrl = `https://fidcomex.up.railway.app/rastreio/${intelipostOrder}`;
 
     msg = `Seu link de rastreio está aqui: ${rastreioUrl}`
-    enviaMensagem(rastreioUrl, msg, contactId)
+    enviaMensagem(msg, contactId)
 
 };
 
