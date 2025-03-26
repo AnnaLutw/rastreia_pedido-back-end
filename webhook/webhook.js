@@ -53,7 +53,7 @@ const formatCpfCnpj = (value) => {
 };
 
 // Função para validar CPF/CNPJ e buscar chave NFe
-const validaCpfCnpj = async (cpf_cnpj, sequelize) => {
+const validaCpfCnpj = async (cpf_cnpj, sequelize, contactId) => {
     if (!isValidCpfCnpj(cpf_cnpj)) {
         return { flag: 'cpf_invalid', message: 'CPF/CNPJ inválido' };
     }
@@ -71,7 +71,7 @@ const validaCpfCnpj = async (cpf_cnpj, sequelize) => {
         }
     );
     if(result.length){
-        enviaRastreio(cpf_cnpj, sequelize)
+        enviaRastreio(cpf_cnpj, sequelize, contactId)
         return{ flag: 'rastreio_encontrado', message: 'CPF/CNPJ válido e encontrado' }
 
     }else{

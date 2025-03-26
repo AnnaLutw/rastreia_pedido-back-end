@@ -59,7 +59,7 @@ app.post('/api/webhook', async (req, res) => {
 
   switch (command) {
       case 'validaCpf':
-          response = await validaCpfCnpj(message.text, sequelize);
+          response = await validaCpfCnpj(message.text, sequelize, contactId);
           flag = response.flag;  // Ajustado para pegar a flag corretamente
           break;
 
