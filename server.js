@@ -84,10 +84,10 @@ const enviarTriggerSignal = async (botId, contactId, flag) => {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
   };
-  url = process.env.API_URL
-  console.log(url)
+  const url_api = process.env.API_URL
+  console.log(url_api)
   console.log(botId)
-  const url = `${url}/api/v1/bots/${botId}/trigger-signal/${contactId}?flag=${flag}`;
+  const url = `${url_api}/api/v1/bots/${botId}/trigger-signal/${contactId}?flag=${flag}`;
 
   try {
       const response = await axios.post(url, {}, { headers });
