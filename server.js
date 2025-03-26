@@ -62,10 +62,15 @@ app.post('/api/webhook', async (req, res) => {
           flag = response.flag;  // Ajustado para pegar a flag corretamente
           break;
 
-      case 'sendStoreChoose':
-          response = await validaCpfCnpj(message.text, sequelize);
-          flag = response.flag;  // Ajustado para pegar a flag corretamente
-          break;
+      // case 'showInformationOrder':
+      //     response = await validaCpfCnpj(message.text, sequelize);
+      //     flag = response.flag;  // Ajustado para pegar a flag corretamente
+      //     break;
+
+      // case 'showInformationOrder':
+      //     response = await validaCpfCnpj(message.text, sequelize);
+      //     flag = response.flag;  // Ajustado para pegar a flag corretamente
+      //     break;
 
       case 'InfomarEmail':
           flag = 'put_number_order';
@@ -75,6 +80,8 @@ app.post('/api/webhook', async (req, res) => {
       default:
           return res.status(400).json({ flag: 'unknown_command', message: 'Comando desconhecido' });
   }
+
+
 
   await enviarTriggerSignal(id, contactId, flag);
   console.log('response :    ' , response)
