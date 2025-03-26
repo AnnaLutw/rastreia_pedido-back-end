@@ -45,8 +45,9 @@ app.get('/api/pedido/:cpf_cnpj', async (req, res) => {
 
 app.post('/api/webhook', async (req, res) => {
   const { data } = req.body;
+  console.log(data)
+
   const { contactId, command, message, serviceId } = data;
-  
   if (!contactId || !command || !message?.text) {
       return res.status(400).json({ flag: 'error', message: 'Dados obrigatórios ausentes' });
   }
@@ -57,6 +58,11 @@ app.post('/api/webhook', async (req, res) => {
 
   switch (command) {
       case 'validaCpf':
+          response = await validaCpfCnpj(message.text, sequelize);
+          flag = response.flag;  // Ajustado para pegar a flag corretamente
+          break;
+
+      case 'sendStoreChoose':
           response = await validaCpfCnpj(message.text, sequelize);
           flag = response.flag;  // Ajustado para pegar a flag corretamente
           break;
@@ -84,6 +90,9 @@ const enviarTriggerSignal = async (botId, contactId, flag) => {
       'Content-Type': 'application/json'
   };
   const url = `https://fidcomex.digisac.co/api/v1/bots/${botId}/trigger-signal/${contactId}?flag=${flag}`;
+
+  console.log('botId:' , botId)
+  console.log('contato ID:' ,contactId)
 
   try {
       const response = await axios.post(url, {}, { headers });
