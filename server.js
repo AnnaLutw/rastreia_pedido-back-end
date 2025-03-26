@@ -62,10 +62,10 @@ app.post('/api/webhook', async (req, res) => {
           flag = response.flag;  // Ajustado para pegar a flag corretamente
           break;
 
-      // case 'showInformationOrder':
-      //     response = await validaCpfCnpj(message.text, sequelize);
-      //     flag = response.flag;  // Ajustado para pegar a flag corretamente
-      //     break;
+      case 'getNumberOrder':
+          response = { flag: 'choose_store', message: 'Nenhum registro encontrado' };
+          flag = response.flag;  // Ajustado para pegar a flag corretamente
+          break;
 
       // case 'showInformationOrder':
       //     response = await validaCpfCnpj(message.text, sequelize);
