@@ -48,7 +48,6 @@ app.post('/api/webhook', async (req, res) => {
   const { contactId, command, message, serviceId } = data;
   
   if (!contactId || !command || !message?.text) {
-    console.log('entrou aqui')
       return res.status(400).json({ flag: 'error', message: 'Dados obrigatórios ausentes' });
   }
 
@@ -85,7 +84,7 @@ const enviarTriggerSignal = async (botId, contactId, flag) => {
       'Content-Type': 'application/json'
   };
   const url_api = process.env.API_URL
-  console.log(url_api)
+  console.log(' url: ' , url_api)
   console.log(botId)
   const url = `${url_api}/api/v1/bots/${botId}/trigger-signal/${contactId}?flag=${flag}`;
 
