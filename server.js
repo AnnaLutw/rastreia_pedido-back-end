@@ -47,7 +47,7 @@ app.post('/api/webhook', async (req, res) => {
   const { data } = req.body;
   console.log(data)
 
-  const { contactId, command, message, serviceId } = data;
+  const { contactId, command, message, serviceId, id } = data;
   if (!contactId || !command || !message?.text) {
       return res.status(400).json({ flag: 'error', message: 'Dados obrigatórios ausentes' });
   }
@@ -76,7 +76,7 @@ app.post('/api/webhook', async (req, res) => {
           return res.status(400).json({ flag: 'unknown_command', message: 'Comando desconhecido' });
   }
 
-  await enviarTriggerSignal(serviceId, contactId, flag);
+  await enviarTriggerSignal(id, contactId, flag);
   console.log('response :    ' , response)
   console.log('message :    ' , message.text)
   res.status(200).json(response);
