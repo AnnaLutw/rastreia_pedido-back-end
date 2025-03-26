@@ -9,7 +9,7 @@ const { validaCpfCnpj } = require('./webhook/webhook'); // Importa a função de
 
 const app = express();
 const port = process.env.PORT || 3000
-const token = process.env.TOKEN_DIGISAC;
+const token = '19321bfe50f0740a7c8663197e22b79644f80268'
 const url_api = process.env.API_URL_DIGISAC
 
 app.use((req, res, next) => {
