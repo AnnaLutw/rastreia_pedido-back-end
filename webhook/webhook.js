@@ -142,7 +142,7 @@ const enviaMensagem = async (msg, contactId) =>{
         text: msg,
         type: "chat",
         contactId : contactId,
-        userId: process.env.USER_ID_DIGISAC,
+        userId: '3af46a66-9ace-436f-b1c9-5b7753f74188',
         origin: "bot"
     };
     console.log('body : ',requestBody)
