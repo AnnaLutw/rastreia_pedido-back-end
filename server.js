@@ -86,7 +86,7 @@ const enviarTriggerSignal = async (botId, contactId, flag) => {
   const url_api = process.env.API_URL
   console.log(' url: ' , url_api)
 
-  const url = `${url_api}/api/v1/bots/${botId}/trigger-signal/${contactId}?flag=${flag}`;
+  const url = `https://fidcomex.digisac.co/api/v1/bots/${botId}/trigger-signal/${contactId}?flag=${flag}`;
 
   console.log(' url: ' , url)
 
