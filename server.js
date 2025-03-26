@@ -47,10 +47,6 @@ app.post('/api/webhook', async (req, res) => {
   const { data } = req.body;
   const { contactId, command, message, serviceId } = data;
   
-  console.log(data)
-  console.log(contactId)
-  console.log(data.contactId)
-
   if (!contactId || !command || !message?.text) {
     console.log('entrou aqui')
       return res.status(400).json({ flag: 'error', message: 'Dados obrigatórios ausentes' });
@@ -88,8 +84,10 @@ const enviarTriggerSignal = async (botId, contactId, flag) => {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
   };
-
-  const url = `${process.env.API_URL}/api/v1/bots/${botId}/trigger-signal/${contactId}?flag=${flag}`;
+  url = process.env.API_URL
+  console.log(url)
+  console.log(botId)
+  const url = `${url}/api/v1/bots/${botId}/trigger-signal/${contactId}?flag=${flag}`;
 
   try {
       const response = await axios.post(url, {}, { headers });
