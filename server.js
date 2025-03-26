@@ -5,7 +5,7 @@ const axios = require('axios'); // 📌 Importando Axios para fazer requisiçõe
 const sequelize = require('./database'); // Importa a instância do Sequelize
 require('dotenv').config(); // Carrega variáveis do .env
 const { pedidos_rastreio } = require('./service/rastreio'); // Importa a função de rastreio
-const { validaCpfCnpj } = require('./webhook/webhook'); // Importa a função de rastreio
+const { validaCpfCnpj, validaEmailj } = require('./webhook/webhook'); // Importa a função de rastreio
 
 const app = express();
 const port = process.env.PORT || 3000
@@ -62,20 +62,20 @@ app.post('/api/webhook', async (req, res) => {
           flag = response.flag;  // Ajustado para pegar a flag corretamente
           break;
 
-      case 'getNumberOrder':
-          response = { flag: 'choose_store', message: 'Nenhum registro encontrado' };
-          flag = response.flag;  // Ajustado para pegar a flag corretamente
-          break;
-
-      // case 'showInformationOrder':
-      //     response = await validaCpfCnpj(message.text, sequelize);
+      // case 'getNumberOrder':
+      //     response = { flag: 'choose_store', message: 'Nenhum registro encontrado' };
       //     flag = response.flag;  // Ajustado para pegar a flag corretamente
       //     break;
 
-      case 'InfomarEmail':
-          flag = 'put_number_order';
-          response = { flag, message: 'Email recebido e processado' };
-          break;
+      // case 'getInfoEmail':
+      //     response = { flag: 'set_number_order', message: 'teste' };
+      //     flag = response.flag;  // Ajustado para pegar a flag corretamente
+      //     break;
+
+      // case 'InfomarEmail':
+      //     flag = 'put_number_order';
+      //     response = { flag, message: 'Email recebido e processado' };
+      //     break;
 
       default:
           return res.status(400).json({ flag: 'unknown_command', message: 'Comando desconhecido' });
