@@ -150,7 +150,7 @@ const enviaMensagem = async (msg, contactId) =>{
         const response = await fetch('https://fidcomex.digisac.co/api/v1/messages', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer 9321bfe50f0740a7c8663197e22b79644f80268`
+                'Authorization': `Bearer 990a07db6cc8c28c2a5547fd72ae4a665a1258d2`
             },
             body: JSON.stringify(requestBody)
         });
