@@ -61,7 +61,7 @@ const validaCpfCnpj = async (cpf_cnpj, sequelize, contactId) => {
     const formattedCpfCnpj = formatCpfCnpj(cpf_cnpj);
 
     const result = await sequelize.query(
-        `SELECT ns.chavenfe,
+        `SELECT ns.chavenfe
         FROM nota_saida ns
         JOIN cliente c ON c.id_cliente = ns.id_cliente
         WHERE c.cpf = :cpf_cnpj OR c.cnpj = :cpf_cnpj`,
