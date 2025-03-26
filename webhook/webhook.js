@@ -1,5 +1,6 @@
 const { Sequelize } = require('sequelize');
 const fetch = require('node-fetch'); // Adicione essa dependência no seu projeto, se necessário
+require('dotenv').config(); // Carrega variáveis do .env
 
 // Função para validar CPF/CNPJ
 const isValidCpfCnpj = (value) => {
