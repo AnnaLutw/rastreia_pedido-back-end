@@ -95,7 +95,8 @@ const enviaRastreio = async (cpf_cnpj, sequelize, contactId) => {
 	        WHEN ns.parceiro = 'FIDCOMERCIOEXTERIOREIRELI' THEN 'Mercado Livre' 
 	        WHEN ns.parceiro LIKE '%WAPSTORE%' THEN 'Site Fid Comex' 
 	        ELSE ns.parceiro 
-	    END AS portal
+	    END AS portal,
+        ns.marketplace_pedido as pedido
         FROM nota_saida ns
         JOIN cliente c ON c.id_cliente = ns.id_cliente
         WHERE c.cpf = :cpf_cnpj OR c.cnpj = :cpf_cnpj or ns.marketplace_pedido = :cpf_cnpj
@@ -112,19 +113,21 @@ const enviaRastreio = async (cpf_cnpj, sequelize, contactId) => {
 
     const intelipostOrder = result[0].intelipost_order;
     const portal          = result[0].portal;
+    const pedido          = result[0].pedido;
     const rastreioUrl     = `https://fidcomex.up.railway.app/rastreio/${intelipostOrder}`;
 
     msg = ` Encontramos seu pedido do ${portal}
+    Pedido :  ${pedido}
+
 O link de rastreio está aqui: 
 ${rastreioUrl}
     `
     enviaMensagem(msg, contactId)
 
     setTimeout(() => {
-        msg = `  
-        Deseja Voltar ao menu inicial?
-        1 - Sim
-        2 - Não`;
+        msg = `Deseja Voltar ao menu inicial?
+1 - Sim
+2 - Não`;
         enviaMensagem(msg, contactId);
     }, 1000); 
 };
