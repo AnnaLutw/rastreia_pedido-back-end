@@ -5,7 +5,7 @@ const axios = require('axios'); // 📌 Importando Axios para fazer requisiçõe
 const sequelize = require('./database'); // Importa a instância do Sequelize
 require('dotenv').config(); // Carrega variáveis do .env
 const { pedidos_rastreio } = require('./service/rastreio'); // Importa a função de rastreio
-const { validaCpfCnpj, enviaRastreio, enviarRastreioPorCpf, enviaNFE } = require('./webhook/webhook'); // Importa a função de rastreio
+const { validaCpfCnpj, enviaRastreio, enviarRastreioPorCpf, enviaNFEPleoCpf, enviaNFEPeloPedido } = require('./webhook/webhook'); // Importa a função de rastreio
 
 const app = express();
 const port = process.env.PORT || 3000
@@ -73,8 +73,11 @@ app.post('/api/webhook', async (req, res) => {
       case 'rastreioPeloPedido':
             response = await enviaRastreio(message.text, sequelize, contactId);
             break;
+      case 'nfePeloPedido':
+            response = await enviaNFEPeloPedido(message.text, sequelize, contactId);
+            break;
       case 'enviaNFECliente':
-            response = await enviaNFE(message.text, sequelize, contactId);
+            response = await enviaNFEPleoCpf(message.text, sequelize, contactId);
             console.log(message.text)
             break;
       default:

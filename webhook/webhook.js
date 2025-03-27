@@ -75,13 +75,8 @@ const valida = async (cpf_cnpj, sequelize) => {
 };
 
 // Envia NFE
-const enviaNFE = async (cpf_cnpj, sequelize, contactId) => {
-    const result = await valida(cpf_cnpj, sequelize);
-
-    if (result === "cpf_invalido") {
-        return { flag: "cpf_invalido", message: "CPF/CNPJ inválido" };
-    }
-
+// Envia NFE - MOVIDO PARA O TOPO
+const enviaNFE = async (sequelize, contactId, result) => {
     if (!result.length) {
         return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
     }
@@ -96,8 +91,36 @@ e insira a seguinte chave :`;
 
     setTimeout(() => enviaMensagem("Para encerrar, digite *fim*", contactId), 1000);
 
-    return { flag: 'nfe_enviada', message: 'CPF/CNPJ válido e encontrado' };
+    return { flag: 'nfe_enviada', message: 'Nfe encontrada' };
 };
+
+// Envia NFE pelo pedido
+const enviaNFEPeloPedido = async (pedido, sequelize, contactId) => {
+    const result = await sequelize.query(
+        `SELECT ns.chavenfe
+        FROM nota_saida ns
+        JOIN cliente c ON c.id_cliente = ns.id_cliente
+        WHERE ns.marketplace_pedido = :pedido`,
+        {
+            type: Sequelize.QueryTypes.SELECT,
+            replacements: { pedido }
+        }
+    );
+
+    enviaNFE(sequelize, contactId, result);
+};
+
+// Envia NFE pelo CPF/CNPJ
+const enviaNFEPleoCpf = async (cpf_cnpj, sequelize, contactId) => {
+    const result = await valida(cpf_cnpj, sequelize);
+
+    if (result === "cpf_invalido") {
+        return { flag: "cpf_invalido", message: "CPF/CNPJ inválido" };
+    }
+
+    enviaNFE(sequelize, contactId, result);
+};
+
 
 
 const validaCpfCnpj = async (cpf_cnpj, sequelize, contactId) => {
@@ -201,4 +224,4 @@ const enviaMensagem = async (msg, contactId) => {
     }
 };
 
-module.exports = { validaCpfCnpj, enviaNFE, enviaRastreio, validaPedido, enviaMensagem };
+module.exports = { validaCpfCnpj, enviaRastreio, validaPedido, enviaMensagem, enviaNFEPleoCpf, enviaNFEPeloPedido };
