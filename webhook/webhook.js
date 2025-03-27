@@ -136,6 +136,8 @@ ${rastreioUrl}
         msg = `Para encerrar digite *fim*`;
         enviaMensagem(msg, contactId);
     }, 1000); 
+
+    return { flag: 'registro_encontrado', message: 'Encontrado' };
 };
 
 const validaPedido = async (pedido, sequelize, contactId) => {
