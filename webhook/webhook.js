@@ -72,7 +72,7 @@ const validaCpfCnpj = async (cpf_cnpj, sequelize, contactId) => {
         }
     );
     if(result.length){
-        enviaRastreio(cpf_cnpj, sequelize, contactId)
+        enviaRastreio(formattedCpfCnpj, sequelize, contactId)
         return{ flag: 'rastreio_encontrado', message: 'CPF/CNPJ válido e encontrado' }
 
     }else{
