@@ -70,9 +70,9 @@ app.post('/api/webhook', async (req, res) => {
       case 'validaPedido':
             response = await validaPedido(message.text, sequelize, contactId);
             break;
-      case 'getNumberOrder':
-            response = await enviaRastreio(message.text, sequelize, contactId);
-            break;
+      // case 'getNumberOrder':
+      //       response = await enviaRastreio(message.text, sequelize, contactId);
+      //       break;
       case 'enviaNFECliente':
             response = await enviaNFE(message.text, sequelize, contactId);
             console.log(message.text)

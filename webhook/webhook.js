@@ -104,24 +104,19 @@ const enviaNFE = async (cpf_cnpj, sequelize, contactId)=>{
 
 const validaCpfCnpj = async (cpf_cnpj, sequelize, contactId) => {
 
-    const result = valida(cpf_cnpj, sequelize, contactId)
+    valida(cpf_cnpj, sequelize, contactId)
 
-    if(result.length){
-        enviaRastreio(formattedCpfCnpj, sequelize, contactId)
-        return{ flag: 'rastreio_encontrado', message: 'CPF/CNPJ válido e encontrado' }
+    const formattedCpfCnpj = formatCpfCnpj(cpf_cnpj);
+    enviaRastreio(formattedCpfCnpj, sequelize, contactId)
 
-    }else{
-         return  { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
-    }
+    return{ flag: 'rastreio_encontrado', message: 'CPF/CNPJ válido e encontrado' }
+
 };
 
+
 const enviarRastreioPorCpf  = async(cpf_cnpj, sequelize, contactId)=>{
-    if (!isValidCpfCnpj(cpf_cnpj)) {
-        return { flag: 'cpf_invalid', message: 'CPF/CNPJ inválido' };
-    }
-    
+    valida(cpf_cnpj, sequelize, contactId)
     const formattedCpfCnpj = formatCpfCnpj(cpf_cnpj);
-   
     
     enviaRastreio(formattedCpfCnpj, sequelize, contactId)
 }
