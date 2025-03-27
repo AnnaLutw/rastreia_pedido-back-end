@@ -80,13 +80,21 @@ const validaCpfCnpj = async (cpf_cnpj, sequelize, contactId) => {
     }
 };
 
-// Função para enviar rastreamento
-const enviaRastreio = async (cpf_cnpj, sequelize, contactId) => {
+const enviarRastreioPorCpf  = async(cpf_cnpj, sequelize, contactId)=>{
     if (!isValidCpfCnpj(cpf_cnpj)) {
         return { flag: 'cpf_invalid', message: 'CPF/CNPJ inválido' };
     }
-
+    
     const formattedCpfCnpj = formatCpfCnpj(cpf_cnpj);
+   
+    
+    enviarRastreioPorCpf(formattedCpfCnpj, sequelize, contactId)
+}
+
+// Função para enviar rastreamento
+const enviaRastreio = async (cpf_cnpj, sequelize, contactId) => {
+  
+    const formattedCpfCnpj = cpf_cnpj
 
     // Busca o código de rastreamento
     const result = await sequelize.query(

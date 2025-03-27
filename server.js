@@ -64,7 +64,7 @@ app.post('/api/webhook', async (req, res) => {
           break;
 
       case 'enviaUrlRastreio': 
-            response = await enviaRastreio(message.text, sequelize, contactId);
+            response = await enviarRastreioPorCpf(message.text, sequelize, contactId);
             flag = response.flag;  // Ajustado para pegar a flag corretamente
               break;
       case 'validaPedido':
@@ -72,7 +72,7 @@ app.post('/api/webhook', async (req, res) => {
             break;
       case 'getNumberOrder':
             response = await enviaRastreio(message.text, sequelize, contactId);
-            flag = 'confirm_order'
+            flag = response.flag;
             break;
       default:
           return res.status(400).json({ flag: 'unknown_command', message: 'Comando desconhecido' });
