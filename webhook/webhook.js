@@ -78,7 +78,7 @@ const valida = async (cpf_cnpj, sequelize) => {
 const enviaNFE = async (cpf_cnpj, sequelize, contactId) => {
     const result = await valida(cpf_cnpj, sequelize);
 
-    if (result === "cpf_invalid") {
+    if (result === "cpf_invalido") {
         return { flag: "cpf_invalido", message: "CPF/CNPJ inválido" };
     }
 
@@ -103,7 +103,7 @@ e insira a seguinte chave :`;
 const validaCpfCnpj = async (cpf_cnpj, sequelize, contactId) => {
     const result = await valida(cpf_cnpj, sequelize, contactId); // Aguarda a validação
 
-    if (result === "cpf_invalid") {
+    if (result === "cpf_invalido") {
         return { flag: "cpf_invalido", message: "CPF/CNPJ inválido" };
     }
     
