@@ -82,6 +82,7 @@ const valida = async (cpf_cnpj, sequelize, contactId)=>{
 
 const enviaNFE = async (cpf_cnpj, sequelize, contactId)=>{
     const result = valida(cpf_cnpj, sequelize, contactId)
+    console.log('teste:' , result)
     
     const chaveNfe = result[0].chavenfe
     console.log(chaveNfe)
