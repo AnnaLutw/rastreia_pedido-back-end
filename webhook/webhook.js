@@ -53,8 +53,8 @@ const formatCpfCnpj = (value) => {
         : cleanedValue.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
 };
 
-// Função para validar CPF/CNPJ e buscar chave NFe
-const validaCpfCnpj = async (cpf_cnpj, sequelize, contactId) => {
+
+const valida = async (cpf_cnpj, sequelize, contactId)=>{
     if (!isValidCpfCnpj(cpf_cnpj)) {
         return { flag: 'cpf_invalid', message: 'CPF/CNPJ inválido' };
     }
@@ -71,6 +71,38 @@ const validaCpfCnpj = async (cpf_cnpj, sequelize, contactId) => {
             replacements: { cpf_cnpj: formattedCpfCnpj }
         }
     );
+    if(!result.length){
+        return  { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
+    }
+
+    return result
+}
+
+const enviaNFE = async (cpf_cnpj, sequelize, contactId)=>{
+    const result = valida(cpf_cnpj, sequelize, contactId)
+    
+    const chaveNfe = result[0].chavenfe
+
+    const msg = `Para acessar sua nfe acesse: https://www.nfe.fazenda.gov.br/portal/consultaRecaptcha.aspx?tipoConsulta=resumo&tipoConteudo=7PhJ+gAVw2g=
+    e coloque a seguinte chave da sua nfe:`
+
+    enviaMensagem(msg, contactId)
+    enviaMensagem(chaveNfe, contactId)
+    setTimeout(() => {
+        msg = `Para encerrar digite *fim*`;
+        enviaMensagem(msg, contactId);
+    }, 1000); 
+
+    return{ flag: 'nfe_enviada', message: 'CPF/CNPJ válido e encontrado' }
+
+   
+
+}
+
+const validaCpfCnpj = async (cpf_cnpj, sequelize, contactId) => {
+
+    const result = valida(cpf_cnpj, sequelize, contactId)
+
     if(result.length){
         enviaRastreio(formattedCpfCnpj, sequelize, contactId)
         return{ flag: 'rastreio_encontrado', message: 'CPF/CNPJ válido e encontrado' }
@@ -169,7 +201,6 @@ const enviaMensagem = async (msg, contactId) =>{
         userId: '3af46a66-9ace-436f-b1c9-5b7753f74188',
         origin: "bot"
     };
-    console.log('body : ',requestBody)
     try {
         const response = await fetch('https://fidcomex.digisac.co/api/v1/messages', {
             method: 'POST',
@@ -190,4 +221,4 @@ const enviaMensagem = async (msg, contactId) =>{
     }
 }
 
-module.exports = { validaCpfCnpj, enviaRastreio, validaPedido, enviaMensagem, enviarRastreioPorCpf };
+module.exports = { validaCpfCnpj, enviaRastreio, validaPedido, enviaMensagem, enviarRastreioPorCpf,enviaNFE };
