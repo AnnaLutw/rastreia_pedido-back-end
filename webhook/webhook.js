@@ -57,7 +57,7 @@ const valida = async (cpf_cnpj, sequelize) => {
     const formattedCpfCnpj = formatCpfCnpj(cpf_cnpj);
 
     if (!isValidCpfCnpj(cpf_cnpj)) {
-        return { flag: 'cpf_invalid', message: 'CPF/CNPJ inválido' };
+        return 'cpf_invalido' ;
     }
 
     const result = await sequelize.query(
@@ -79,7 +79,7 @@ const enviaNFE = async (cpf_cnpj, sequelize, contactId) => {
     const result = await valida(cpf_cnpj, sequelize);
 
     if (result === "cpf_invalid") {
-        return { flag: "cpf_invalid", message: "CPF/CNPJ inválido" };
+        return { flag: "cpf_invalido", message: "CPF/CNPJ inválido" };
     }
 
     if (!result.length) {
@@ -104,7 +104,7 @@ const validaCpfCnpj = async (cpf_cnpj, sequelize, contactId) => {
     const result = await valida(cpf_cnpj, sequelize, contactId); // Aguarda a validação
 
     if (result === "cpf_invalid") {
-        return { flag: "cpf_invalid", message: "CPF/CNPJ inválido" };
+        return { flag: "cpf_invalido", message: "CPF/CNPJ inválido" };
     }
     
     if (!result.length) {
