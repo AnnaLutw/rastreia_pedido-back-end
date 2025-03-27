@@ -88,9 +88,11 @@ const enviaNFE = async (cpf_cnpj, sequelize, contactId) => {
 
     const chaveNfe = result[0].chavenfe;
     const msg = `Para acessar sua NFE, acesse: https://www.nfe.fazenda.gov.br/portal/consultaRecaptcha.aspx?tipoConsulta=resumo&tipoConteudo=7PhJ+gAVw2g= 
-    e insira a seguinte chave: ${chaveNfe}`;
+e insira a seguinte:`;
 
     await enviaMensagem(msg, contactId);
+    await enviaMensagem(chaveNfe, contactId);
+
     setTimeout(() => enviaMensagem("Para encerrar, digite *fim*", contactId), 1000);
 
     return { flag: 'nfe_enviada', message: 'CPF/CNPJ válido e encontrado' };
