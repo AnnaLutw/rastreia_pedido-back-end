@@ -87,8 +87,9 @@ const enviaNFE = async (cpf_cnpj, sequelize, contactId) => {
     }
 
     const chaveNfe = result[0].chavenfe;
-    const msg = `Para acessar sua NFE, acesse: https://www.nfe.fazenda.gov.br/portal/consultaRecaptcha.aspx?tipoConsulta=resumo&tipoConteudo=7PhJ+gAVw2g= 
-e insira a seguinte:`;
+    const msg = `Para acessar sua NFE, acesse: 
+https://www.nfe.fazenda.gov.br/portal/consultaRecaptcha.aspx?tipoConsulta=resumo&tipoConteudo=7PhJ+gAVw2g=  
+e insira a seguinte chave :`;
 
     await enviaMensagem(msg, contactId);
     await enviaMensagem(chaveNfe, contactId);
@@ -200,4 +201,4 @@ const enviaMensagem = async (msg, contactId) => {
     }
 };
 
-module.exports = { validaCpfCnpj: enviaNFE, enviaRastreio, validaPedido, enviaMensagem };
+module.exports = { validaCpfCnpj, enviaNFE, enviaRastreio, validaPedido, enviaMensagem };
