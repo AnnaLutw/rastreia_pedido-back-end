@@ -77,11 +77,7 @@ const valida = async (cpf_cnpj, sequelize) => {
 // Envia NFE
 // Envia NFE - MOVIDO PARA O TOPO
 const enviaNFE = async (sequelize, contactId, result) => {
-    console.log(result)
-    if (!result.length) {
-        return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
-    }
-
+  
     const chaveNfe = result[0].chavenfe;
     const msg = `Para acessar sua NFE, acesse: 
 https://www.nfe.fazenda.gov.br/portal/consultaRecaptcha.aspx?tipoConsulta=resumo&tipoConteudo=7PhJ+gAVw2g=  
@@ -108,16 +104,27 @@ const enviaNFEPeloPedido = async (pedido, sequelize, contactId) => {
         }
     );
 
+    if (!result.length) {
+        console.log('entra aqui')
+        return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
+    }
+
     enviaNFE(sequelize, contactId, result);
+
+ 
 };
 
 // Envia NFE pelo CPF/CNPJ
 const enviaNFEPleoCpf = async (cpf_cnpj, sequelize, contactId) => {
     const result = await valida(cpf_cnpj, sequelize);
-    console.log(result)
     
     if (result === "cpf_invalido") {
         return { flag: "cpf_invalido", message: "CPF/CNPJ inválido" };
+    }
+
+    if (!result.length) {
+        console.log('entra aqui')
+        return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
     }
 
     enviaNFE(sequelize, contactId, result);
