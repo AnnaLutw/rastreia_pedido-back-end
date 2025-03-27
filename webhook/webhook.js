@@ -95,7 +95,7 @@ const validaCpfParaTroca = async (cpf_cnpj, sequelize, contactId) => {
         return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
     }
 
-    await validaParaCancelamentoTroca(result, contactId);
+    return await validaParaCancelamentoTroca(result, contactId);
 };
 
 
