@@ -143,7 +143,7 @@ Email : ${email}`;
     msg = `Iremos te transferir para o atendente, aguarde um minuto`;
     await enviaMensagem(msg, contactId);
 
-    if (portal === 'Mercado Livre') {
+    if (portal === 'Mercado Livre' || pedido.startsWith('20000')) {
         return { flag: 'encaminha_troca_meli', message: 'Encontrado' };
     }
 
