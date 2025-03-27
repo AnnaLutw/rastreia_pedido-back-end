@@ -5,7 +5,7 @@ const axios = require('axios'); // 📌 Importando Axios para fazer requisiçõe
 const sequelize = require('./database'); // Importa a instância do Sequelize
 require('dotenv').config(); // Carrega variáveis do .env
 const { pedidos_rastreio } = require('./service/rastreio'); // Importa a função de rastreio
-const { validaCpfCnpj, enviaRastreio, enviarRastreioPorCpf, enviaNFEPleoCpf, enviaNFEPeloPedido } = require('./webhook/webhook'); // Importa a função de rastreio
+const { validaCpfCnpj, enviaRastreio, enviarRastreioPorCpf, enviaNFEPleoCpf, enviaNFEPeloPedido, validaCpfParaTroca, validaPedidoParaTroca } = require('./webhook/webhook'); // Importa a função de rastreio
 
 const app = express();
 const port = process.env.PORT || 3000
@@ -78,8 +78,13 @@ app.post('/api/webhook', async (req, res) => {
             break;
       case 'enviaNFECliente':
             response = await enviaNFEPleoCpf(message.text, sequelize, contactId);
-            console.log(message.text)
             break;
+      case 'validaCpfParaTroca':
+              response = await validaCpfParaTroca(message.text, sequelize, contactId);
+              break;
+      case 'validaPedidoParaTroca':
+              response = await validaPedidoParaTroca(message.text, sequelize, contactId);
+              break;
       default:
           return res.status(400).json({ flag: 'unknown_command', message: 'Comando desconhecido' });
   }

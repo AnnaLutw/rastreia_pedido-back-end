@@ -61,10 +61,19 @@ const valida = async (cpf_cnpj, sequelize) => {
     }
 
     const result = await sequelize.query(
-        `SELECT ns.chavenfe
+        `SELECT ns.chavenfe,
+                ns.marketplace_pedido,
+                c.email,
+                c.razsocial, 
+                CASE 
+                    WHEN ns.parceiro = 'FIDCOMERCIOEXTERIOREIRELI' THEN 'Mercado Livre' 
+                    WHEN ns.parceiro LIKE '%WAPSTORE%' THEN 'Site Fid ComeX' 
+                    ELSE ns.parceiro 
+	            END AS "Portal"
         FROM nota_saida ns
         JOIN cliente c ON c.id_cliente = ns.id_cliente
-        WHERE c.cpf = :cpf_cnpj OR c.cnpj = :cpf_cnpj`,
+        WHERE c.cpf = :cpf_cnpj OR c.cnpj = :cpf_cnpj or ns.marketplace_pedido = :cpf_cnpj
+        and ns.chavenfe <> ''`,
         {
             type: Sequelize.QueryTypes.SELECT,
             replacements: { cpf_cnpj: formattedCpfCnpj }
@@ -73,6 +82,64 @@ const valida = async (cpf_cnpj, sequelize) => {
 
     return result;
 };
+
+
+const validaCpfParaTroca = async (cpf_cnpj, sequelize, contactId) => {
+    const result = await valida(cpf_cnpj, sequelize);
+
+    if (!result.length) {
+        return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
+    }
+
+    await validaParaCancelamentoTroca(result, contactId);
+};
+
+
+const validaPedidoParaTroca = async (pedido, sequelize, contactId) => {
+    const result = await sequelize.query(
+        `SELECT ns.chavenfe, ns.marketplace_pedido, c.email, c.razsocial, ns.portal
+        FROM nota_saida ns
+        JOIN cliente c ON c.id_cliente = ns.id_cliente
+        WHERE ns.marketplace_pedido = :pedido`,
+        {
+            type: Sequelize.QueryTypes.SELECT,
+            replacements: { pedido }
+        }
+    );
+
+    if (!result.length) {
+        if (pedido.startsWith('20000')) {
+            return { flag: 'registro_nao_encontrado_meli', message: 'Nenhum registro encontrado' };
+        }
+
+        return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
+    }
+
+    await validaParaCancelamentoTroca(result, contactId);
+};
+
+
+const validaParaCancelamentoTroca = async (result, contactId) => {
+    if (!result.length) {
+        return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
+    }
+
+    const { marketplace_pedido: pedido, email, razsocial: nome, portal } = result[0];
+
+    let msg = `${nome}, encontramos seu pedido *${pedido}* efetuado em ${portal} com email ${email}`;
+    await enviaMensagem(msg, contactId);
+
+    msg = `Iremos te transferir para o atendente, aguarde um minuto`;
+    await enviaMensagem(msg, contactId);
+
+    if (portal === 'Mercado Livre') {
+        return { flag: 'encaminha_troca_meli', message: 'Encontrado' };
+    }
+
+    return { flag: 'encaminha_troca_sac', message: 'Encontrado' };
+};
+
+
 
 // Envia NFE
 // Envia NFE - MOVIDO PARA O TOPO
@@ -103,11 +170,16 @@ const enviaNFEPeloPedido = async (pedido, sequelize, contactId) => {
             replacements: { pedido }
         }
     );
+   
 
     if (!result.length) {
-        console.log('entra aqui')
+        if (pedido.startsWith('20000')) {
+            return { flag: 'registro_nao_encontrado_meli', message: 'Nenhum registro encontrado' };
+        }
+    
         return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
     }
+    
 
     enviaNFE(sequelize, contactId, result);
 
@@ -233,4 +305,4 @@ const enviaMensagem = async (msg, contactId) => {
     }
 };
 
-module.exports = { validaCpfCnpj, enviaRastreio, validaPedido, enviaMensagem, enviaNFEPleoCpf, enviaNFEPeloPedido };
+module.exports = { validaCpfCnpj, enviaRastreio, validaPedido, enviaMensagem, enviaNFEPleoCpf, enviaNFEPeloPedido, validaCpfParaTroca, validaPedidoParaTroca };
