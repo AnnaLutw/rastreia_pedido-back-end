@@ -88,7 +88,7 @@ const enviarRastreioPorCpf  = async(cpf_cnpj, sequelize, contactId)=>{
     const formattedCpfCnpj = formatCpfCnpj(cpf_cnpj);
    
     
-    enviarRastreioPorCpf(formattedCpfCnpj, sequelize, contactId)
+    enviaRastreio(formattedCpfCnpj, sequelize, contactId)
 }
 
 // Função para enviar rastreamento
@@ -183,7 +183,6 @@ const enviaMensagem = async (msg, contactId) =>{
             body: JSON.stringify(requestBody)
         });
         
-        console.log(response)
         if (!response.ok) {
             throw new Error(`Erro ao enviar rastreamento: ${response.statusText}`);
         }
@@ -194,4 +193,4 @@ const enviaMensagem = async (msg, contactId) =>{
     }
 }
 
-module.exports = { validaCpfCnpj, enviaRastreio, validaPedido, enviaMensagem };
+module.exports = { validaCpfCnpj, enviaRastreio, validaPedido, enviaMensagem, enviarRastreioPorCpf };

@@ -5,7 +5,7 @@ const axios = require('axios'); // 📌 Importando Axios para fazer requisiçõe
 const sequelize = require('./database'); // Importa a instância do Sequelize
 require('dotenv').config(); // Carrega variáveis do .env
 const { pedidos_rastreio } = require('./service/rastreio'); // Importa a função de rastreio
-const { validaCpfCnpj, enviaRastreio } = require('./webhook/webhook'); // Importa a função de rastreio
+const { validaCpfCnpj, enviaRastreio, enviarRastreioPorCpf } = require('./webhook/webhook'); // Importa a função de rastreio
 
 const app = express();
 const port = process.env.PORT || 3000
