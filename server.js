@@ -70,7 +70,7 @@ app.post('/api/webhook', async (req, res) => {
       case 'validaPedido':
             response = await validaPedido(message.text, sequelize, contactId);
             break;
-      case 'showInformationOrder':
+      case 'getNumberOrder':
             response = await enviaRastreio(message.text, sequelize, contactId);
             flag = 'confirm_order'
             break;
