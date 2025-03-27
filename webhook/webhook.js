@@ -72,7 +72,7 @@ const valida = async (cpf_cnpj, sequelize) => {
 	            END AS "Portal"
         FROM nota_saida ns
         JOIN cliente c ON c.id_cliente = ns.id_cliente
-        WHERE c.cpf = :cpf_cnpj OR c.cnpj = :cpf_cnpj or ns.marketplace_pedido = :cpf_cnpj
+        WHERE c.cpf = :cpf_cnpj OR c.cnpj = :cpf_cnpj 
         and ns.chavenfe <> ''`,
         {
             type: Sequelize.QueryTypes.SELECT,
@@ -87,6 +87,10 @@ const valida = async (cpf_cnpj, sequelize) => {
 const validaCpfParaTroca = async (cpf_cnpj, sequelize, contactId) => {
     const result = await valida(cpf_cnpj, sequelize);
 
+    if (result === "cpf_invalido") {
+        return { flag: "cpf_invalido", message: "CPF/CNPJ inválido" };
+    }
+
     if (!result.length) {
         return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
     }
@@ -97,7 +101,15 @@ const validaCpfParaTroca = async (cpf_cnpj, sequelize, contactId) => {
 
 const validaPedidoParaTroca = async (pedido, sequelize, contactId) => {
     const result = await sequelize.query(
-        `SELECT ns.chavenfe, ns.marketplace_pedido, c.email, c.razsocial, ns.portal
+        `SELECT SELECT ns.chavenfe,
+                ns.marketplace_pedido,
+                c.email,
+                c.razsocial, 
+                CASE 
+                    WHEN ns.parceiro = 'FIDCOMERCIOEXTERIOREIRELI' THEN 'Mercado Livre' 
+                    WHEN ns.parceiro LIKE '%WAPSTORE%' THEN 'Site Fid ComeX' 
+                    ELSE ns.parceiro 
+	            END AS "Portal"
         FROM nota_saida ns
         JOIN cliente c ON c.id_cliente = ns.id_cliente
         WHERE ns.marketplace_pedido = :pedido`,
@@ -106,7 +118,7 @@ const validaPedidoParaTroca = async (pedido, sequelize, contactId) => {
             replacements: { pedido }
         }
     );
-
+    
     if (!result.length) {
         if (pedido.startsWith('20000')) {
             return { flag: 'registro_nao_encontrado_meli', message: 'Nenhum registro encontrado' };
@@ -120,13 +132,10 @@ const validaPedidoParaTroca = async (pedido, sequelize, contactId) => {
 
 
 const validaParaCancelamentoTroca = async (result, contactId) => {
-    if (!result.length) {
-        return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
-    }
-
+    
     const { marketplace_pedido: pedido, email, razsocial: nome, portal } = result[0];
 
-    let msg = `${nome}, encontramos seu pedido *${pedido}* efetuado em ${portal} com email ${email}`;
+    let msg = `${nome}, encontramos seu pedido *${pedido}* com email ${email}`;
     await enviaMensagem(msg, contactId);
 
     msg = `Iremos te transferir para o atendente, aguarde um minuto`;
