@@ -116,8 +116,8 @@ const enviaRastreio = async (cpf_cnpj, sequelize, contactId) => {
     const pedido          = result[0].pedido;
     const rastreioUrl     = `https://fidcomex.up.railway.app/rastreio/${intelipostOrder}`;
 
-    msg = ` Encontramos seu pedido do ${portal}
-    Pedido :  ${pedido}
+    msg = ` Encontramos seu pedido do *${portal}*
+Pedido :  ${pedido}
 
 O link de rastreio está aqui: 
 ${rastreioUrl}
@@ -125,9 +125,7 @@ ${rastreioUrl}
     enviaMensagem(msg, contactId)
 
     setTimeout(() => {
-        msg = `Deseja Voltar ao menu inicial?
-1 - Sim
-2 - Não`;
+        msg = `Para encerrar digite *fim*`;
         enviaMensagem(msg, contactId);
     }, 1000); 
 };

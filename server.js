@@ -98,9 +98,6 @@ const enviarTriggerSignal = async (botId, contactId, flag) => {
   };
   const url = `https://fidcomex.digisac.co/api/v1/bots/${botId}/trigger-signal/${contactId}?flag=${flag}`;
 
-  console.log('botId:' , botId)
-  console.log('contato ID:' ,contactId)
-
   try {
       const response = await axios.post(url, {}, { headers });
       console.log('Trigger enviado com sucesso:', response.data);
