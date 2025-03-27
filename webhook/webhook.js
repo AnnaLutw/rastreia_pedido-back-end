@@ -60,7 +60,7 @@ const valida = async (cpf_cnpj, sequelize, contactId)=>{
     }
 
     const formattedCpfCnpj = formatCpfCnpj(cpf_cnpj);
-
+    console.log(formattedCpfCnpj)
     const result = await sequelize.query(
         `SELECT ns.chavenfe
         FROM nota_saida ns
@@ -72,8 +72,11 @@ const valida = async (cpf_cnpj, sequelize, contactId)=>{
         }
     );
     if(!result.length){
+        console.log('result: ', result)
+
         return  { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
     }
+    console.log('teste')
 
     return result
 }
