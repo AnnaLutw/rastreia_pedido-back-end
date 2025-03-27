@@ -72,7 +72,6 @@ app.post('/api/webhook', async (req, res) => {
             break;
       case 'getNumberOrder':
             response = await enviaRastreio(message.text, sequelize, contactId);
-            flag = response.flag;
             break;
       default:
           return res.status(400).json({ flag: 'unknown_command', message: 'Comando desconhecido' });

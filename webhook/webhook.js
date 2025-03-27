@@ -94,8 +94,6 @@ const enviarRastreioPorCpf  = async(cpf_cnpj, sequelize, contactId)=>{
 // Função para enviar rastreamento
 const enviaRastreio = async (cpf_cnpj, sequelize, contactId) => {
   
-    const formattedCpfCnpj = cpf_cnpj
-
     // Busca o código de rastreamento
     const result = await sequelize.query(
         `SELECT ns.intelipost_order,
@@ -111,7 +109,7 @@ const enviaRastreio = async (cpf_cnpj, sequelize, contactId) => {
         limit 1`,
         {
             type: Sequelize.QueryTypes.SELECT,
-            replacements: { cpf_cnpj: formattedCpfCnpj }
+            replacements: { cpf_cnpj: cpf_cnpj }
         }
     );
 
@@ -137,7 +135,6 @@ ${rastreioUrl}
         enviaMensagem(msg, contactId);
     }, 1000); 
 
-    return { flag: 'registro_encontrado', message: 'Encontrado' };
 };
 
 const validaPedido = async (pedido, sequelize, contactId) => {
