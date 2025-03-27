@@ -92,7 +92,7 @@ const validaCpfParaTroca = async (cpf_cnpj, sequelize, contactId) => {
     }
 
     if (!result.length) {
-        return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
+        return { flag: 'registro_nao_encontrado_troca', message: 'Nenhum registro encontrado' };
     }
 
     return await validaParaCancelamentoTroca(result, contactId);
@@ -140,7 +140,7 @@ Pedido : *${pedido}*
 Email : ${email}`;
     await enviaMensagem(msg, contactId);
 
-    msg = `Iremos te transferir para o atendente, aguarde um minuto`;
+    msg = `Aguarde um momento iremos te transferir para um dos nossos atendentes.`;
     await enviaMensagem(msg, contactId);
 
     if (portal === 'Mercado Livre' || pedido.startsWith('20000')) {
