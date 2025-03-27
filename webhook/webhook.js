@@ -135,7 +135,9 @@ const validaParaCancelamentoTroca = async (result, contactId) => {
     
     const { marketplace_pedido: pedido, email, razsocial: nome, portal } = result[0];
 
-    let msg = `${nome}, encontramos seu pedido *${pedido}* com email ${email}`;
+    let msg = `${nome}, encontramos seu pedido 
+Pedido : *${pedido}* 
+Email : ${email}`;
     await enviaMensagem(msg, contactId);
 
     msg = `Iremos te transferir para o atendente, aguarde um minuto`;
