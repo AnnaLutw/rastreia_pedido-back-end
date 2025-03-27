@@ -60,7 +60,6 @@ const valida = async (cpf_cnpj, sequelize, contactId)=>{
     }
 
     const formattedCpfCnpj = formatCpfCnpj(cpf_cnpj);
-    console.log(formattedCpfCnpj)
     const result = await sequelize.query(
         `SELECT ns.chavenfe
         FROM nota_saida ns
@@ -71,12 +70,12 @@ const valida = async (cpf_cnpj, sequelize, contactId)=>{
             replacements: { cpf_cnpj: formattedCpfCnpj }
         }
     );
+    console.log('result: ', result)
+
     if(!result.length){
-        console.log('result: ', result)
 
         return  { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
     }
-    console.log('teste')
 
     return result
 }
@@ -85,6 +84,7 @@ const enviaNFE = async (cpf_cnpj, sequelize, contactId)=>{
     const result = valida(cpf_cnpj, sequelize, contactId)
     
     const chaveNfe = result[0].chavenfe
+    console.log(chaveNfe)
 
     const msg = `Para acessar sua nfe acesse: https://www.nfe.fazenda.gov.br/portal/consultaRecaptcha.aspx?tipoConsulta=resumo&tipoConteudo=7PhJ+gAVw2g=
     e coloque a seguinte chave da sua nfe:`
