@@ -298,14 +298,14 @@ const validaEmailOutrosAssuntos = async (email, sequelize, contactId) => {
 
     const result = await sequelize.query(
         `SELECT ns.chavenfe,
-                ns.marketplace_pedido,
+                ns.marketplace_pedido as pedido,
                 c.email,
                 ns.intelipost_order,
                 CASE 
                     WHEN ns.parceiro = 'FIDCOMERCIOEXTERIOREIRELI' THEN 'Mercado Livre' 
                     WHEN ns.parceiro LIKE '%WAPSTORE%' THEN 'Site Fid ComeX' 
                     ELSE ns.parceiro 
-	            END AS "Portal"
+	            END AS portal
         FROM nota_saida ns
         JOIN cliente c ON c.id_cliente = ns.id_cliente
         WHERE c.email = :email
@@ -316,8 +316,8 @@ const validaEmailOutrosAssuntos = async (email, sequelize, contactId) => {
         }
     );
 
-    if (!result.length ) {
-
+    if (result.length ) {
+        console.log(result)
         const { intelipost_order, portal, pedido } = result[0];
         const rastreioUrl = `https://fidcomex.up.railway.app/rastreio/${intelipost_order}`;
 
@@ -326,6 +326,7 @@ const validaEmailOutrosAssuntos = async (email, sequelize, contactId) => {
 
         return { flag: 'email_encontrado', message: 'Nenhum pedido encontrado' };
     }
+    
     await enviaMensagem('Por gentileza, informe o motivo do seu chamado.', contactId);
 
     return { flag: 'email_valido', message: 'Email válido' };
