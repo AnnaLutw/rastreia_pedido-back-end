@@ -288,6 +288,53 @@ const validaPedido = async (pedido, sequelize, contactId) => {
     await enviaMensagem(`Seu pedido foi encontrado! Código: ${result[0].intelipost_order}`, contactId);
 };
 
+
+const validaEmailOutrosAssuntos = async (email, sequelize, contactId) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!email || !emailRegex.test(email)) {
+        return { flag: 'email_invalido', message: 'Email inválido' };
+    }
+
+    const result = await sequelize.query(
+        `SELECT ns.chavenfe,
+                ns.marketplace_pedido,
+                c.email,
+                c.razsocial, 
+                CASE 
+                    WHEN ns.parceiro = 'FIDCOMERCIOEXTERIOREIRELI' THEN 'Mercado Livre' 
+                    WHEN ns.parceiro LIKE '%WAPSTORE%' THEN 'Site Fid ComeX' 
+                    ELSE ns.parceiro 
+	            END AS "Portal"
+        FROM nota_saida ns
+        JOIN cliente c ON c.id_cliente = ns.id_cliente
+        WHERE c.email = :email
+        and ns.chavenfe <> ''`,
+        {
+            type: Sequelize.QueryTypes.SELECT,
+            replacements: { email }
+        }
+    );
+
+    if (!result.length || !result[0].intelipost_order) {
+
+        let msg = `Encontramos seu pedido do *${portal}*\nPedido: ${pedido}\n\nO link de rastreamento é:\n${rastreioUrl}`;
+        await enviaMensagem(msg, contactId);
+
+        msg = `Por gentileza, informe o motivo do seu chamado.`;
+
+
+        return { flag: 'email_encontrado', message: 'Nenhum pedido encontrado' };
+    }
+    await enviaMensagem('Por gentileza, informe o motivo do seu chamado.', contactId);
+    
+    return { flag: 'email_valido', message: 'Email válido' };
+};
+
+
+
+
+
 // Envia mensagem
 const enviaMensagem = async (msg, contactId) => {
     const requestBody = {
@@ -316,4 +363,14 @@ const enviaMensagem = async (msg, contactId) => {
     }
 };
 
-module.exports = { validaCpfCnpj, enviaRastreio, validaPedido, enviaMensagem, enviaNFEPleoCpf, enviaNFEPeloPedido, validaCpfParaTroca, validaPedidoParaTroca };
+module.exports = { 
+    validaCpfCnpj, 
+    enviaRastreio, 
+    validaPedido, 
+    enviaMensagem,
+    enviaNFEPleoCpf, 
+    enviaNFEPeloPedido, 
+    validaCpfParaTroca, 
+    validaPedidoParaTroca, 
+    validaEmailOutrosAssuntos 
+};
