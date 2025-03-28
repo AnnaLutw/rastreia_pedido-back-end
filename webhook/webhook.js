@@ -127,7 +127,7 @@ const validaPedidoParaTroca = async (pedido, sequelize, contactId) => {
         return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
     }
 
-    await validaParaCancelamentoTroca(result, contactId);
+    return await validaParaCancelamentoTroca(result, contactId);
 };
 
 
@@ -192,7 +192,7 @@ const enviaNFEPeloPedido = async (pedido, sequelize, contactId) => {
     }
     
 
-    enviaNFE(sequelize, contactId, result);
+    return enviaNFE(sequelize, contactId, result);
 
  
 };
@@ -210,7 +210,7 @@ const enviaNFEPleoCpf = async (cpf_cnpj, sequelize, contactId) => {
         return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
     }
 
-    enviaNFE(sequelize, contactId, result);
+    return enviaNFE(sequelize, contactId, result);
 };
 
 
