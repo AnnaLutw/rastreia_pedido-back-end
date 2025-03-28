@@ -53,7 +53,7 @@ app.get('/api/pedido/:cpf_cnpj', async (req, res) => {
 
 app.post('/api/webhook', async (req, res) => {
   const { data } = req.body;
-
+  console.log('data teste:', data)
   const { contactId, command, message, serviceId, id } = data;
   console.log('comando: ',command)
 
