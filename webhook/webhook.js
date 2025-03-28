@@ -317,7 +317,7 @@ const validaEmailOutrosAssuntos = async (email, sequelize, contactId) => {
     );
 
     if (!result.length || !result[0].intelipost_order) {
-
+        const { intelipost_order, portal, pedido } = result[0];
         let msg = `Encontramos seu pedido do *${portal}*\nPedido: ${pedido}\n\nO link de rastreamento é:\n${rastreioUrl}`;
         await enviaMensagem(msg, contactId);
 
@@ -327,7 +327,7 @@ const validaEmailOutrosAssuntos = async (email, sequelize, contactId) => {
         return { flag: 'email_encontrado', message: 'Nenhum pedido encontrado' };
     }
     await enviaMensagem('Por gentileza, informe o motivo do seu chamado.', contactId);
-    
+
     return { flag: 'email_valido', message: 'Email válido' };
 };
 
