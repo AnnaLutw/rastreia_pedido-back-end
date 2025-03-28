@@ -234,7 +234,7 @@ const validaCpfCnpj = async (cpf_cnpj, sequelize, contactId) => {
 };
 
 
-// Envia rastreamento
+// Envia rastreio
 const enviaRastreio = async (cpf_cnpj, sequelize, contactId) => {
     const result = await sequelize.query(
         `SELECT ns.intelipost_order, 
@@ -255,13 +255,13 @@ const enviaRastreio = async (cpf_cnpj, sequelize, contactId) => {
     );
 
     if (!result.length || !result[0].intelipost_order) {
-        return { flag: 'registro_nao_encontrado', message: 'Nenhum código de rastreamento encontrado' };
+        return { flag: 'registro_nao_encontrado', message: 'Nenhum código de rastreio encontrado' };
     }
 
     const { intelipost_order, portal, pedido } = result[0];
     const rastreioUrl = `https://fidcomex.up.railway.app/rastreio/${intelipost_order}`;
 
-    const msg = `Encontramos seu pedido do *${portal}*\nPedido: ${pedido}\n\nO link de rastreamento é:\n${rastreioUrl}`;
+    const msg = `Encontramos seu pedido do *${portal}*\nPedido: ${pedido}\n\nO link de rastreio é:\n${rastreioUrl}`;
     await enviaMensagem(msg, contactId);
 
     setTimeout(() => enviaMensagem("Para encerrar, digite *fim*", contactId), 1000);
@@ -300,7 +300,7 @@ const validaEmailOutrosAssuntos = async (email, sequelize, contactId) => {
         `SELECT ns.chavenfe,
                 ns.marketplace_pedido,
                 c.email,
-                c.razsocial, 
+                ns.intelipost_order,
                 CASE 
                     WHEN ns.parceiro = 'FIDCOMERCIOEXTERIOREIRELI' THEN 'Mercado Livre' 
                     WHEN ns.parceiro LIKE '%WAPSTORE%' THEN 'Site Fid ComeX' 
@@ -317,12 +317,11 @@ const validaEmailOutrosAssuntos = async (email, sequelize, contactId) => {
     );
 
     if (!result.length || !result[0].intelipost_order) {
+        const rastreioUrl = `https://fidcomex.up.railway.app/rastreio/${intelipost_order}`;
+
         const { intelipost_order, portal, pedido } = result[0];
-        let msg = `Encontramos seu pedido do *${portal}*\nPedido: ${pedido}\n\nO link de rastreamento é:\n${rastreioUrl}`;
+        let msg = `Encontramos seu pedido do *${portal}*\nPedido: ${pedido}\n\nO link de rastreio é:\n${rastreioUrl}`;
         await enviaMensagem(msg, contactId);
-
-        msg = `Por gentileza, informe o motivo do seu chamado.`;
-
 
         return { flag: 'email_encontrado', message: 'Nenhum pedido encontrado' };
     }
