@@ -265,6 +265,8 @@ const enviaRastreio = async (cpf_cnpj, sequelize, contactId) => {
     await enviaMensagem(msg, contactId);
 
     setTimeout(() => enviaMensagem("Para encerrar, digite *fim*", contactId), 1000);
+
+    return { flag: 'rastreio_enviado', message:'Rastreio enviado'};
 };
 
 // Valida pedido
