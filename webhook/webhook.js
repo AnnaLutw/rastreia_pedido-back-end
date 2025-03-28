@@ -206,7 +206,6 @@ const enviaNFEPleoCpf = async (cpf_cnpj, sequelize, contactId) => {
     }
 
     if (!result.length) {
-        console.log('entra aqui')
         return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
     }
 

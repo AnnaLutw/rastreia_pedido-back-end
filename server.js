@@ -60,12 +60,10 @@ app.post('/api/webhook', async (req, res) => {
   switch (command) {
       case 'validaCpf':
           response = await validaCpfCnpj(message.text, sequelize, contactId);
-          flag = response.flag;  // Ajustado para pegar a flag corretamente
           break;
 
       case 'enviaUrlRastreio': 
             response = await enviarRastreioPorCpf(message.text, sequelize, contactId);
-            flag = response.flag;  // Ajustado para pegar a flag corretamente
               break;
       case 'validaPedido':
             response = await validaPedido(message.text, sequelize, contactId);
@@ -87,13 +85,16 @@ app.post('/api/webhook', async (req, res) => {
               break;
       default:
           return res.status(400).json({ flag: 'unknown_command', message: 'Comando desconhecido' });
+
+
+
   }
+  flag = response.flag;
 
   if(command != 'enviaUrlRastreio'){
     await enviarTriggerSignal(id, contactId, flag);
       
   }
-
 
   console.log('response :    ' , response)
   console.log('message :    ' , message.text)
