@@ -60,7 +60,7 @@ const pesquisasSql = async(pesquisa, tipo, sequelize) => {
         pesquisa = formatCpfCnpj(pesquisa);
         if (!isValidCpfCnpj(pesquisa)) return 'cpf_invalido';
 
-        filtro = `AND (c.cpf = :pesquisa OR c.cnpj = :pesquisa OR c.marketplace_pedido = :pesquisa)`;
+        filtro = `AND (c.cpf = :pesquisa OR c.cnpj = :pesquisa OR ns.marketplace_pedido = :pesquisa)`;
     }
 
     if (tipo === 'pedido')  filtro = `AND ns.marketplace_pedido = :pesquisa`;
