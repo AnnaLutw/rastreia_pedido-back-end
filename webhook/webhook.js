@@ -101,7 +101,7 @@ const validaCpfParaTroca = async (cpf_cnpj, sequelize, contactId) => {
 
 const validaPedidoParaTroca = async (pedido, sequelize, contactId) => {
     const result = await sequelize.query(
-        `SELECT SELECT ns.chavenfe,
+        `SELECT ns.chavenfe,
                 ns.marketplace_pedido,
                 c.email,
                 c.razsocial, 
@@ -112,7 +112,8 @@ const validaPedidoParaTroca = async (pedido, sequelize, contactId) => {
 	            END AS "Portal"
         FROM nota_saida ns
         JOIN cliente c ON c.id_cliente = ns.id_cliente
-        WHERE ns.marketplace_pedido = :pedido`,
+        WHERE ns.marketplace_pedido = :pedido
+        and ns.chavenfe <> ''`,
         {
             type: Sequelize.QueryTypes.SELECT,
             replacements: { pedido }
