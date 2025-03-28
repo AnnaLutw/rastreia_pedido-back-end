@@ -286,6 +286,9 @@ const validaPedido = async (pedido, sequelize, contactId) => {
     }
 
     await enviaMensagem(`Seu pedido foi encontrado! Código: ${result[0].intelipost_order}`, contactId);
+
+    return { flag: 'pedido_encontrado', message: 'Encontrado' };
+
 };
 
 
