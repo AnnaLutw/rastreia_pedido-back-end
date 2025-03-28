@@ -316,10 +316,11 @@ const validaEmailOutrosAssuntos = async (email, sequelize, contactId) => {
         }
     );
 
-    if (!result.length || !result[0].intelipost_order) {
-        const rastreioUrl = `https://fidcomex.up.railway.app/rastreio/${intelipost_order}`;
+    if (!result.length ) {
 
         const { intelipost_order, portal, pedido } = result[0];
+        const rastreioUrl = `https://fidcomex.up.railway.app/rastreio/${intelipost_order}`;
+
         let msg = `Encontramos seu pedido do *${portal}*\nPedido: ${pedido}\n\nO link de rastreio é:\n${rastreioUrl}`;
         await enviaMensagem(msg, contactId);
 
