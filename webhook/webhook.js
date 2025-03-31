@@ -193,7 +193,7 @@ const validaCpfCnpj = async (cpf_cnpj, sequelize, contactId) => {
     const result = await pesquisasSql(cpf_cnpj, 'cpf_cnpj', sequelize)
 
     if (result === "cpf_invalido") return { flag: "cpf_invalido", message: "CPF/CNPJ inválido" };
-    console.log('result here': result)
+    console.log('result here', result)
     if (!result.length)  return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
     
     return await encontrou_pedido(result, contactId); // Aguarda o envio do rastreio
