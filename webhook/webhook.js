@@ -86,8 +86,8 @@ const pesquisasSql = async(pesquisa, tipo, sequelize) => {
             type: sequelize.QueryTypes.SELECT,
             replacements: replacements
         }
-    );
-
+    );  
+    console.log(result)
     return result;
 }
 
