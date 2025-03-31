@@ -54,7 +54,6 @@ app.get('/api/pedido/:cpf_cnpj', async (req, res) => {
 app.post('/api/webhook', async (req, res) => {
   const { data } = req.body;
   const { contactId, command, message, serviceId, id } = data;
-  console.log('comando: ',command)
 
   if (!contactId || !command || !message?.text) {
       return res.status(400).json({ flag: 'error', message: 'Dados obrigatórios ausentes' });
@@ -105,7 +104,7 @@ app.post('/api/webhook', async (req, res) => {
     await enviarTriggerSignal(id, contactId, flag);
       
   }
-
+  console.log('comando: ',command)
   console.log('response :    ' , response)
   console.log('message :    ' , message.text)
   res.status(200).json(response);
@@ -122,7 +121,6 @@ const enviarTriggerSignal = async (botId, contactId, flag) => {
 
   try {
       const response = await axios.post(url, {}, { headers });
-      console.log('Trigger enviado com sucesso:', response.data);
       return { success: true, data: response.data };
   } catch (error) {
       console.error('Erro ao enviar trigger:', error.response?.data || error.message);
