@@ -60,7 +60,7 @@ const pesquisasSql = async(pesquisa, tipo, sequelize) => {
         pesquisa = formatCpfCnpj(pesquisa);
         if (!isValidCpfCnpj(pesquisa)) return 'cpf_invalido';
 
-        filtro = `AND (c.cpf = :pesquisa OR c.cnpj = :pesquisa OR ns.marketplace_pedido = :pesquisa)`;
+        filtro = `AND (c.cpf = :pesquisa OR c.cnpj = :pesquisa)`;
     }
 
     if (tipo === 'pedido')  filtro = `AND ns.marketplace_pedido = :pesquisa`;
@@ -120,23 +120,28 @@ const validaPedidoParaTroca = async (pedido, sequelize, contactId) => {
 
 
 const processaValidacaoTroca = async (result, contactId) => {
-    
     const { pedido, email, razsocial: nome, portal } = result[0];
 
     let msg = ` ${nome}, encontramos seu pedido\n Pedido : *${pedido}*\n Email : ${email}`;
-
     await enviaMensagem(msg, contactId);
 
-    msg = `Aguarde um momento iremos te transferir para um dos nossos atendentes.`;
+    const hoje = new Date().getDay(); // 0 (domingo) a 6 (sábado)
+
+    if (hoje === 0 || hoje === 6) {
+        msg = "Nosso atendimento funciona de segunda a sexta. Aguarde até segunda-feira para ser transferido para um atendente.";
+    } else {
+        msg = "Aguarde um momento, iremos te transferir para um dos nossos atendentes.";
+    }
+    
     await enviaMensagem(msg, contactId);
 
-    const flag = (portal === 'Mercado Livre' || pedido.startsWith('20000')) 
-    ? 'encaminha_troca_meli' 
-    : 'encaminha_troca_sac';
+    const flag = (portal === "Mercado Livre" || pedido.startsWith("20000")) 
+        ? "encaminha_troca_meli" 
+        : "encaminha_troca_sac";
 
-
-    return { flag, message: 'Encontrado' };
+    return { flag, message: "Encontrado" };
 };
+
 
 
 const enviaNFE = async (sequelize, contactId, result) => {
@@ -185,33 +190,36 @@ const validaCpfCnpj = async (cpf_cnpj, sequelize, contactId) => {
     const result = await pesquisasSql(cpf_cnpj, 'cpf_cnpj', sequelize)
 
     if (result === "cpf_invalido") return { flag: "cpf_invalido", message: "CPF/CNPJ inválido" };
-    
+
     if (!result.length)  return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
     
+    await encontrou_pedido(result, contactId); // Aguarda o envio do rastreio
 
-    const formattedCpfCnpj = formatCpfCnpj(cpf_cnpj);
-    await enviaRastreio(formattedCpfCnpj, sequelize, contactId); // Aguarda o envio do rastreio
-
-    return { flag: 'rastreio_encontrado', message: 'CPF/CNPJ válido e encontrado' };
 };
 
 
-const enviaRastreio = async (cpf_cnpj, sequelize, contactId) => {
-
-    const result = await pesquisasSql(cpf_cnpj, 'cpf_cnpj', sequelize);
-
-    if (!result?.intelipost_order) {
-        return { flag: 'registro_nao_encontrado', message: 'Nenhum código de rastreio encontrado' };
-    }
+const encontrou_pedido = async (result, contactId) => {
 
     const { intelipost_order, portal, pedido } = result;
     const rastreioUrl = `https://fidcomex.up.railway.app/rastreio/${intelipost_order}`;
     const msg = `Encontramos seu pedido do *${portal}*\nPedido: ${pedido}\n\nO link de rastreio é:\n${rastreioUrl}`;
 
     await enviaMensagem(msg, contactId);
-    setTimeout(() => enviaMensagem("Para encerrar, digite *fim*", contactId), 1000);
+    setTimeout(() => enviaMensagem("Para encerrar, digite *fim*", contactId), 1000)
 
     return { flag: 'rastreio_enviado', message: 'Rastreio enviado' };
+
+}
+
+
+const enviaRastreio = async (pedido, sequelize, contactId) => {
+
+    const result = await pesquisasSql(pedido, 'pedido', sequelize);
+
+    if (!result.length)  return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
+
+    return await encontrou_pedido(result, contactId); 
+
 };
 
 
@@ -242,6 +250,8 @@ const validaEmailOutrosAssuntos = async (email, sequelize, contactId) => {
 
         let msg = `Encontramos seu pedido do *${portal}*\nPedido: ${pedido}\n\nO link de rastreio é:\n${rastreioUrl}`;
         await enviaMensagem(msg, contactId);
+
+        await enviaMensagem('Por gentileza, informe o motivo do seu chamado.', contactId);
 
         return { flag: 'email_encontrado', message: 'Nenhum pedido encontrado' };
     }
