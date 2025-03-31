@@ -84,7 +84,7 @@ const pesquisasSql = async(pesquisa, tipo, sequelize) => {
         ${filtro}`,
         {
             type: sequelize.QueryTypes.SELECT,
-            replacements: replacements
+            replacements
         }
     );  
     console.log(result)
@@ -200,7 +200,7 @@ const validaCpfCnpj = async (cpf_cnpj, sequelize, contactId) => {
 
 const encontrou_pedido = async (result, contactId) => {
 
-    const { intelipost_order, portal, pedido } = result;
+    const { intelipost_order, portal, pedido } = result[0];
     const rastreioUrl = `https://fidcomex.up.railway.app/rastreio/${intelipost_order}`;
     const msg = `Encontramos seu pedido do *${portal}*\nPedido: ${pedido}\n\nO link de rastreio é:\n${rastreioUrl}`;
 
