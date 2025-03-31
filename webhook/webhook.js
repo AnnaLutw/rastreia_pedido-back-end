@@ -193,7 +193,7 @@ const validaCpfCnpj = async (cpf_cnpj, sequelize, contactId) => {
 
     if (!result.length)  return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
     
-    await encontrou_pedido(result, contactId); // Aguarda o envio do rastreio
+    return await encontrou_pedido(result, contactId); // Aguarda o envio do rastreio
 
 };
 
