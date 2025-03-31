@@ -54,13 +54,10 @@ const formatCpfCnpj = (value) => {
 
 const pesquisasSql = async(pesquisa, tipo, sequelize) => {
     let filtro = '';
-    let replacements = { pesquisa };
 
     if (tipo === 'cpf_cnpj') {
-        console.log('pesquisa antes: ',pesquisa)
 
         pesquisa = formatCpfCnpj(pesquisa);
-        console.log('pesquisa depois: ',pesquisa)
         if (!isValidCpfCnpj(pesquisa)) return 'cpf_invalido';
 
         filtro = `AND (c.cpf = :pesquisa OR c.cnpj = :pesquisa)`;
@@ -69,7 +66,10 @@ const pesquisasSql = async(pesquisa, tipo, sequelize) => {
     if (tipo === 'pedido')  filtro = `AND ns.marketplace_pedido = :pesquisa`;
     
     if (tipo === 'email')  filtro = `AND c.email = :pesquisa`;
+
+    let replacements = { pesquisa };
     
+
     const result = await sequelize.query(
         `SELECT ns.chavenfe,
                 ns.marketplace_pedido as pedido,
@@ -90,7 +90,6 @@ const pesquisasSql = async(pesquisa, tipo, sequelize) => {
             replacements
         }
     );  
-    console.log(result)
     return result;
 }
 
@@ -193,7 +192,6 @@ const validaCpfCnpj = async (cpf_cnpj, sequelize, contactId) => {
     const result = await pesquisasSql(cpf_cnpj, 'cpf_cnpj', sequelize)
 
     if (result === "cpf_invalido") return { flag: "cpf_invalido", message: "CPF/CNPJ inválido" };
-    console.log('result here', result)
     if (!result.length)  return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
     
     return await encontrou_pedido(result, contactId); // Aguarda o envio do rastreio
