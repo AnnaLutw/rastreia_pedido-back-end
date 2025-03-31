@@ -60,7 +60,7 @@ const pesquisasSql = async(pesquisa, tipo, sequelize) => {
 
         pesquisa = formatCpfCnpj(pesquisa);
         if (!isValidCpfCnpj(pesquisa)) return 'cpf_invalido';
-        replacements = pesquisa
+        replacements = {pesquisa}
         filtro = `AND (c.cpf = :pesquisa OR c.cnpj = :pesquisa)`;
     }
 
