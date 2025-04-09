@@ -80,9 +80,11 @@ const pesquisasSql = async(pesquisa, tipo, sequelize) => {
                     WHEN ns.parceiro = 'FIDCOMERCIOEXTERIOREIRELI' THEN 'Mercado Livre' 
                     WHEN ns.parceiro LIKE '%WAPSTORE%' THEN 'Site Fid ComeX' 
                     ELSE ns.parceiro 
-                END AS portal
+                END AS portal,
+                er.evento
         FROM nota_saida ns
         JOIN cliente c ON c.id_cliente = ns.id_cliente
+        JOIN entrega_rastreio er ON er.id_nota_saida = ns.id_nota_saida
         WHERE ns.chavenfe <> ''
         ${filtro}`,
         {
@@ -211,9 +213,9 @@ const validaCpfCnpj = async (cpf_cnpj, sequelize, contactId) => {
 
 const encontrou_pedido = async (result, contactId) => {
 
-    const { intelipost_order, portal, pedido } = result[0];
+    const { intelipost_order, portal, pedido, evento } = result[0];
     const rastreioUrl = `https://fidcomex.up.railway.app/rastreio/${intelipost_order}`;
-    const msg = `Encontramos seu pedido do *${portal}*\nPedido: ${pedido}\n\nO link de rastreio é:\n${rastreioUrl}`;
+    const msg = `Encontramos seu pedido do *${portal}*\nPedido: ${pedido}\n Status Atual: ${evento} \n\nO link de rastreio é:\n${rastreioUrl}`;
 
     await enviaMensagem(msg, contactId);
 
