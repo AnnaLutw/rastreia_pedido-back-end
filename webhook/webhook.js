@@ -138,15 +138,14 @@ const processaValidacaoTroca = async (result, contactId) => {
     let msg = ` ${nome}, encontramos seu pedido \n Portal : *${portal}* \n Pedido : *${pedido}*`;
     if (email) {
         msg += `\n Email : ${email}`;
-    };
+    }
 
-    const agora = new Date();
+    const agora = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
     const diaSemana = agora.getDay(); 
     const hora = agora.getHours();
     const minuto = agora.getMinutes();
 
     const foraDiaUtil = (diaSemana === 0 || diaSemana === 6);
-
     const antesDoInicio = hora < 8 || (hora === 8 && minuto < 30);
     const depoisDoFim = hora > 17 || (hora === 17 && minuto > 30);
     const foraHorario = antesDoInicio || depoisDoFim;
@@ -165,6 +164,7 @@ const processaValidacaoTroca = async (result, contactId) => {
 
     return { flag, message: "Encontrado" };
 };
+
 
 
 
