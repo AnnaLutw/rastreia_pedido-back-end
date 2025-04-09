@@ -124,17 +124,28 @@ const validaPedidoParaTroca = async (pedido, sequelize, contactId) => {
 const processaValidacaoTroca = async (result, contactId) => {
     const { pedido, email, razsocial: nome, portal } = result[0];
 
-    let msg = ` ${nome}, encontramos seu pedido\n Pedido : *${pedido}*\n Email : ${email}`;
-    await enviaMensagem(msg, contactId);
+    let msg = ` ${nome}, encontramos seu pedido \n Portal : *${portal}* \n Pedido : *${pedido}*`;
+    if (email) {
+        msg += `\n Email : ${email}`;
+    };
 
-    const hoje = new Date().getDay(); // 0 (domingo) a 6 (sábado)
+    const agora = new Date();
+    const diaSemana = agora.getDay(); 
+    const hora = agora.getHours();
+    const minuto = agora.getMinutes();
 
-    if (hoje === 0 || hoje === 6) {
-        msg = "Nosso atendimento funciona de segunda a sexta. Aguarde até segunda-feira para ser transferido para um atendente.";
+    const foraDiaUtil = (diaSemana === 0 || diaSemana === 6);
+
+    const antesDoInicio = hora < 8 || (hora === 8 && minuto < 30);
+    const depoisDoFim = hora > 17 || (hora === 17 && minuto > 30);
+    const foraHorario = antesDoInicio || depoisDoFim;
+
+    if (foraDiaUtil || foraHorario) {
+        msg = "Nosso atendimento funciona de segunda a sexta, das 08:30 às 17:30. Por favor, aguarde até o próximo horário de atendimento.";
     } else {
         msg = "Aguarde um momento, iremos te transferir para um dos nossos atendentes.";
     }
-    
+
     await enviaMensagem(msg, contactId);
 
     const flag = (portal === "Mercado Livre" || pedido.startsWith("20000")) 
@@ -143,6 +154,7 @@ const processaValidacaoTroca = async (result, contactId) => {
 
     return { flag, message: "Encontrado" };
 };
+
 
 
 
@@ -206,7 +218,6 @@ const encontrou_pedido = async (result, contactId) => {
     const msg = `Encontramos seu pedido do *${portal}*\nPedido: ${pedido}\n\nO link de rastreio é:\n${rastreioUrl}`;
 
     await enviaMensagem(msg, contactId);
-    setTimeout(() => enviaMensagem("Para encerrar, digite *fim*", contactId), 1000)
 
     return { flag: 'rastreio_enviado', message: 'Rastreio enviado' };
 
