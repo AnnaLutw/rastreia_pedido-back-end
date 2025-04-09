@@ -166,8 +166,6 @@ const enviaNFE = async (sequelize, contactId, result) => {
     await enviaMensagem(msg, contactId);
     await enviaMensagem(chaveNfe, contactId);
 
-    setTimeout(() => enviaMensagem("Para encerrar, digite *fim*", contactId), 1000);
-
     return { flag: 'nfe_enviada', message: 'Nfe encontrada' };
 };
 
