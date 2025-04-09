@@ -224,8 +224,6 @@ const encontrou_pedido = async (result, contactId) => {
 
     const { intelipost_order, portal, pedido, evento } = result[0];
 
-    if()
-
     const rastreioUrl = `https://fidcomex.up.railway.app/rastreio/${intelipost_order}`;
     const msg = `Encontramos seu pedido do *${portal}*\nPedido: ${pedido}\nStatus Atual: ${evento} \n\nO link de rastreio é:\n${rastreioUrl}`;
 
