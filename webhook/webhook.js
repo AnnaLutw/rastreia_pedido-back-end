@@ -139,6 +139,7 @@ const processaValidacaoTroca = async (result, contactId) => {
     if (email) {
         msg += `\n Email : ${email}`;
     }
+    await enviaMensagem(msg, contactId);
 
     const agora = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
     const diaSemana = agora.getDay(); 
@@ -150,6 +151,7 @@ const processaValidacaoTroca = async (result, contactId) => {
     const depoisDoFim = hora > 17 || (hora === 17 && minuto > 30);
     const foraHorario = antesDoInicio || depoisDoFim;
 
+    
     if (foraDiaUtil || foraHorario) {
         msg = "Nosso atendimento funciona de segunda a sexta, das 08:30 às 17:30. Por favor, aguarde até o próximo horário de atendimento.";
     } else {
