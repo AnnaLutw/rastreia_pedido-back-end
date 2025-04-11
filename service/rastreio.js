@@ -31,10 +31,10 @@ const pedidos_rastreio = async (cpf_cnpj) => {
                 WHEN ns.parceiro = 'SHOPEE' THEN 'Shopee' 
                 ELSE ns.parceiro 
             END AS portal
-    FROM nota_saida ns
-    JOIN cliente c ON c.id_cliente = ns.id_cliente
-    JOIN nota_saida_itens nsi ON ns.id_nota_saida = nsi.id_nota_saida   
-    JOIN produto p ON p.id_produto = nsi.id_produto 
+    FROM sysemp.nota_saida ns
+    JOIN sysemp.cliente c ON c.id_cliente = ns.id_cliente
+    JOIN sysemp.nota_saida_itens nsi ON ns.id_nota_saida = nsi.id_nota_saida   
+    JOIN sysemp.produto p ON p.id_produto = nsi.id_produto 
     WHERE (c.cpf = :cpf_cnpj OR ns.intelipost_order = :cpf_cnpj OR c.cnpj = :cpf_cnpj)
     AND ns.chavenfe <> ''
     AND ns.marketplace_pedido <> ''
