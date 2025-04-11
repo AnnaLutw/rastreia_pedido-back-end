@@ -82,14 +82,14 @@ const pesquisasSql = async(pesquisa, tipo, sequelize) => {
                 ELSE ns.parceiro 
             END AS portal,
             er.evento
-        FROM nota_saida ns
-        JOIN cliente c ON c.id_cliente = ns.id_cliente
+        FROM sysemp.nota_saida ns
+        JOIN sysemp.cliente c ON c.id_cliente = ns.id_cliente
         JOIN (
             SELECT er1.*
-            FROM entrega_rastreio er1
+            FROM sysemp.entrega_rastreio er1
             JOIN (
                 SELECT id_nota_saida, MAX(dthr_atualizacao) AS max_dth
-                FROM entrega_rastreio
+                FROM sysemp.entrega_rastreio
                 GROUP BY id_nota_saida
             ) latest ON er1.id_nota_saida = latest.id_nota_saida 
                     AND er1.dthr_atualizacao = latest.max_dth
