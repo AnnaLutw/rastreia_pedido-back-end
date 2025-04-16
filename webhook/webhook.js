@@ -261,13 +261,12 @@ const validaPedido = async (pedido, sequelize, contactId) => {
 };
 
 
-const validaEmailOutrosAssuntos = async (email, sequelize, contactId) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const validaEmailOutrosAssuntos = async (cpf_cnpj, sequelize, contactId) => {
+   
+    const result = await pesquisasSql(cpf_cnpj, 'cpf_cnpj', sequelize);
 
-    if (!email || !emailRegex.test(email)) return { flag: 'email_invalido', message: 'Email inválido' };
+    if (result === "cpf_invalido") return { flag: "cpf_invalido_outros_assuntos", message: "CPF/CNPJ inválido" };
 
-    const result = await pesquisasSql(email, 'email', sequelize);
-  
     if (result.length ) {
         const { intelipost_order, portal, pedido } = result[0];
         const rastreioUrl = `https://fidcomex.up.railway.app/rastreio/${intelipost_order}`;
@@ -277,12 +276,12 @@ const validaEmailOutrosAssuntos = async (email, sequelize, contactId) => {
 
         await enviaMensagem('Por gentileza, informe o motivo do seu chamado.', contactId);
 
-        return { flag: 'email_encontrado', message: 'Nenhum pedido encontrado' };
+        return { flag: 'cpf_encontrado_outros_assuntos', message: 'Nenhum pedido encontrado' };
     }
     
     await enviaMensagem('Por gentileza, informe o motivo do seu chamado.', contactId);
 
-    return { flag: 'email_valido', message: 'Email válido' };
+    return { flag: 'cpf_valido_outros_assuntos', message: 'Email válido' };
 };
 
 
