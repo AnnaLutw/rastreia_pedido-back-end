@@ -274,16 +274,27 @@ const validaEmailOutrosAssuntos = async (cpf_cnpj, sequelize, contactId) => {
         let msg = `Encontramos seu pedido do *${portal}*\nPedido: ${pedido}\n\nO link de rastreio é:\n${rastreioUrl}`;
         await enviaMensagem(msg, contactId);
 
-        await enviaMensagem('Por gentileza, informe o motivo do seu chamado.', contactId);
-
-        return { flag: 'cpf_encontrado_outros_assuntos', message: 'Nenhum pedido encontrado' };
+        return { flag: 'cpf_encontrado_outros_assuntos', message: 'Pedido encontrado' };
     }
     
     await enviaMensagem('Por gentileza, informe o motivo do seu chamado.', contactId);
 
-    return { flag: 'cpf_valido_outros_assuntos', message: 'Email válido' };
+    return { flag: 'cpf_valido_outros_assuntos', message: 'cpf válido' };
 };
 
+const falarSobreOutroAssunto = async(mensagem, contactId) =>{
+    
+    if(mensagem == 1){
+
+        await enviaMensagem('Aguarde um momento iremos te transferir para um dos nossos atendentes.', contactId);
+        return { flag: 'ok', message: 'ok' };
+    }
+
+    await enviaMensagem('Por gentileza, informe o motivo do seu chamado.', contactId);
+    return { flag: 'outro_assunto', message: 'outro_assunto' };
+
+
+}
 
 
 // Envia mensagem
@@ -323,5 +334,6 @@ module.exports = {
     enviaNFEPeloPedido, 
     validaCpfParaTroca, 
     validaPedidoParaTroca, 
-    validaEmailOutrosAssuntos 
+    validaEmailOutrosAssuntos ,
+    falarSobreOutroAssunto
 };
