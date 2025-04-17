@@ -12,8 +12,7 @@ const { validaCpfCnpj,
     enviaNFEPeloPedido, 
     validaCpfParaTroca, 
     validaPedidoParaTroca, 
-    validaEmailOutrosAssuntos,
-    falarSobreOutroAssunto
+    validaEmailOutrosAssuntos
 } = require('./webhook/webhook'); // Importa a função de rastreio
 
 const app = express();
@@ -93,9 +92,6 @@ app.post('/api/webhook', async (req, res) => {
       case 'validaEmailOutrosAssuntos':
             response = await validaEmailOutrosAssuntos(message.text, sequelize, contactId);
             break;
-      case 'falarSobreOutroAssunto':
-            response = await falarSobreOutroAssunto(message.text, sequelize, contactId);
-            break; 
       default:
           return res.status(400).json({ flag: 'unknown_command', message: 'Comando desconhecido' });
 

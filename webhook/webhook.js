@@ -328,6 +328,5 @@ module.exports = {
     enviaNFEPeloPedido, 
     validaCpfParaTroca, 
     validaPedidoParaTroca, 
-    validaEmailOutrosAssuntos ,
-    falarSobreOutroAssunto
+    validaEmailOutrosAssuntos 
 };
