@@ -274,8 +274,12 @@ const validaEmailOutrosAssuntos = async (cpf_cnpj, sequelize, contactId) => {
     if (result === "cpf_invalido") return { flag: "cpf_invalido_outros_assuntos", message: "CPF/CNPJ inválido" };
 
     if (result.length ) {
-        const { intelipost_order, portal, pedido } = result[0];
-        const rastreioUrl = `https://fidcomex.up.railway.app/rastreio/${intelipost_order}`;
+        const { intelipost_order, portal, pedido, transportadora_ecommerce } = result[0];
+        let rastreioUrl = `https://fidcomex.up.railway.app/rastreio/${intelipost_order}`;
+
+        if( transportadora_ecommerce == 'ENVVIAS NOR'){
+            rastreioUrl = 'https://vvlog.uxdelivery.com.br/tracking'
+        }
 
         let msg = `Encontramos seu pedido do *${portal}*\nPedido: ${pedido}\n\nO link de rastreio é:\n${rastreioUrl}`;
         await enviaMensagem(msg, contactId);
