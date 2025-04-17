@@ -81,7 +81,8 @@ const pesquisasSql = async(pesquisa, tipo, sequelize) => {
                 WHEN ns.parceiro LIKE '%WAPSTORE%' THEN 'Site Fid ComeX' 
                 ELSE ns.parceiro 
             END AS portal,
-            er.evento
+            er.evento,
+            ns.transportadora_ecommerce 
         FROM sysemp.nota_saida ns
         JOIN sysemp.cliente c ON c.id_cliente = ns.id_cliente
         JOIN (
@@ -94,6 +95,7 @@ const pesquisasSql = async(pesquisa, tipo, sequelize) => {
             ) latest ON er1.id_nota_saida = latest.id_nota_saida 
                     AND er1.dthr_atualizacao = latest.max_dth
         ) er ON er.id_nota_saida = ns.id_nota_saida
+             AND ns.transportadora_ecommerce <> 'ENVVIAS NOR'
         WHERE ns.chavenfe <> ''
         ${filtro}`,
         {
@@ -169,8 +171,6 @@ const processaValidacaoTroca = async (result, contactId) => {
 
 
 
-
-
 const enviaNFE = async (sequelize, contactId, result) => {
   
     const chaveNfe = result[0].chavenfe;
@@ -217,6 +217,7 @@ const validaCpfCnpj = async (cpf_cnpj, sequelize, contactId) => {
     if (result === "cpf_invalido") return { flag: "cpf_invalido", message: "CPF/CNPJ inválido" };
     if (!result.length)  return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
     
+
     return await encontrou_pedido(result, contactId); // Aguarda o envio do rastreio
 
 };
@@ -224,9 +225,14 @@ const validaCpfCnpj = async (cpf_cnpj, sequelize, contactId) => {
 
 const encontrou_pedido = async (result, contactId) => {
 
-    const { intelipost_order, portal, pedido, evento } = result[0];
+    const { intelipost_order, portal, pedido, evento, transportadora_ecommerce  } = result[0];
 
-    const rastreioUrl = `https://fidcomex.up.railway.app/rastreio/${intelipost_order}`;
+    let rastreioUrl = `https://fidcomex.up.railway.app/rastreio/${intelipost_order}`;
+
+    if( transportadora_ecommerce == 'ENVVIAS NOR'){
+        rastreioUrl = 'https://vvlog.uxdelivery.com.br/tracking'
+    }
+
     const msg = `Encontramos seu pedido do *${portal}*\nPedido: ${pedido}\nStatus Atual: ${evento} \n\nO link de rastreio é:\n${rastreioUrl}`;
 
     await enviaMensagem(msg, contactId);
@@ -282,19 +288,7 @@ const validaEmailOutrosAssuntos = async (cpf_cnpj, sequelize, contactId) => {
     return { flag: 'cpf_valido_outros_assuntos', message: 'cpf válido' };
 };
 
-const falarSobreOutroAssunto = async(mensagem, contactId) =>{
-    
-    if(mensagem == 1){
 
-        await enviaMensagem('Aguarde um momento iremos te transferir para um dos nossos atendentes.', contactId);
-        return { flag: 'ok', message: 'ok' };
-    }
-
-    await enviaMensagem('Por gentileza, informe o motivo do seu chamado.', contactId);
-    return { flag: 'outro_assunto', message: 'outro_assunto' };
-
-
-}
 
 
 // Envia mensagem
