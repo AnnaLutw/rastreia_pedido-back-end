@@ -137,7 +137,7 @@ const validaPedidoParaTroca = async (pedido, sequelize, contactId) => {
 const processaValidacaoTroca = async (result, contactId) => {
     const { pedido, email, razsocial: nome, portal } = result[0];
 
-    let msg = ` ${nome}, encontramos seu pedido \n Portal : *${portal}* \n Pedido : *${pedido}*`;
+    let msg = ` ${nome}, encontramos seu pedido\n Portal : *${portal}*\n Pedido : *${pedido}*`;
     if (email) {
         msg += `\n Email : ${email}`;
     }
@@ -153,12 +153,22 @@ const processaValidacaoTroca = async (result, contactId) => {
     const depoisDoFim = hora > 17 || (hora === 17 && minuto > 30);
     const foraHorario = antesDoInicio || depoisDoFim;
 
-    
-    if (foraDiaUtil || foraHorario) {
+    const dia = agora.getDate();
+    const mes = agora.getMonth() + 1; // Janeiro é 0
+
+    const feriadoAbril = mes === 4 && dia >= 18 && dia <= 21;
+
+    if (feriadoAbril) {
+        msg = "Informamos que no período de 18/04/25 à 21/04/25 não haverá expediente devido aos feriados nacionais e final de semana.\n";
+        msg += "Assim que retornarmos no dia 22/04/25 responderemos por ordem de envio das mensagens.\n";
+        msg += "Não é necessário enviar mais de uma mensagem sobre o mesmo assunto, pois dessa forma evitará que você seja direcionado ao final da fila.\n";
+        msg += "Agradecemos a compreensão e em breve, retornaremos!\n";
+    } else if (foraDiaUtil || foraHorario) {
         msg = "Nosso atendimento funciona de segunda a sexta, das 08:30 às 17:30. Por favor, aguarde até o próximo horário de atendimento.";
     } else {
         msg = "Aguarde um momento, iremos te transferir para um dos nossos atendentes.";
     }
+
 
     await enviaMensagem(msg, contactId);
 
@@ -207,7 +217,6 @@ const enviaNFEPleoCpf = async (cpf_cnpj, sequelize, contactId) => {
 
     return enviaNFE(sequelize, contactId, result);
 };
-
 
 
 const validaCpfCnpj = async (cpf_cnpj, sequelize, contactId) => {
@@ -268,10 +277,17 @@ const validaPedido = async (pedido, sequelize, contactId) => {
 
 
 const validaEmailOutrosAssuntos = async (cpf_cnpj, sequelize, contactId) => {
-   
+    const agora = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+
+    const dia = agora.getDate();
+    const mes = agora.getMonth() + 1; // Janeiro é 0
+
+    const feriadoAbril = mes === 4 && dia >= 18 && dia <= 21;
+
     const result = await pesquisasSql(cpf_cnpj, 'cpf_cnpj', sequelize);
 
     if (result === "cpf_invalido") return { flag: "cpf_invalido_outros_assuntos", message: "CPF/CNPJ inválido" };
+
 
     if (result.length ) {
         const { intelipost_order, portal, pedido, transportadora_ecommerce } = result[0];
@@ -284,15 +300,23 @@ const validaEmailOutrosAssuntos = async (cpf_cnpj, sequelize, contactId) => {
         let msg = `Encontramos seu pedido do *${portal}*\nPedido: ${pedido}\n\nO link de rastreio é:\n${rastreioUrl}`;
         await enviaMensagem(msg, contactId);
 
+        
         return { flag: 'cpf_encontrado_outros_assuntos', message: 'Pedido encontrado' };
     }
     
     await enviaMensagem('Por gentileza, informe o motivo do seu chamado.', contactId);
 
+    if (feriadoAbril) {
+        msg = "Informamos que no período de 18/04/25 à 21/04/25 não haverá expediente devido aos feriados nacionais e final de semana.\n";
+        msg += "Assim que retornarmos no dia 22/04/25 responderemos por ordem de envio das mensagens.\n";
+        msg += "Não é necessário enviar mais de uma mensagem sobre o mesmo assunto, pois dessa forma evitará que você seja direcionado ao final da fila.\n";
+        msg += "Agradecemos a compreensão e em breve, retornaremos!\n";
+
+        await enviaMensagem(msg, contactId);
+    }
+
     return { flag: 'cpf_valido_outros_assuntos', message: 'cpf válido' };
 };
-
-
 
 
 // Envia mensagem
