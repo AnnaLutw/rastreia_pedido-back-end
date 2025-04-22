@@ -152,9 +152,9 @@ const validaParaTroca = async (valor, sequelize, contactId, type = 'cpf_cnpj') =
 const processaValidacaoTroca = async (result, contactId) => {
     const { pedido, email, razsocial: nome, portal } = result[0];
 
-    let msg = ` ${nome}, encontramos seu pedido\n Portal : *${portal}*\n Pedido : *${pedido}*`;
+    let msg = ` ${nome}, encontramos seu pedido\nPortal : *${portal}*\nPedido : *${pedido}*`;
     if (email) {
-        msg += `\n Email : ${email}`;
+        msg += `\nEmail : ${email}`;
     }
     await enviaMensagem(msg, contactId);
 
@@ -181,7 +181,7 @@ const enviaNFE = async (cpf_cnpj, sequelize, contactId, type = 'cpf_cnpj') => {
     }
 
     const chaveNfe = result[0].chavenfe;
-    const msg = `Para acessar sua NFE, acesse: \n https://www.nfe.fazenda.gov.br/portal/consultaRecaptcha.aspx?tipoConsulta=resumo&tipoConteudo=7PhJ+gAVw2g= \ne insira a seguinte chave :`;
+    const msg = `Para acessar sua NFE, acesse: \nhttps://www.nfe.fazenda.gov.br/portal/consultaRecaptcha.aspx?tipoConsulta=resumo&tipoConteudo=7PhJ+gAVw2g=\ne insira a seguinte chave :`;
 
     await enviaMensagem(msg, contactId);
     await enviaMensagem(chaveNfe, contactId);
