@@ -52,6 +52,29 @@ const formatCpfCnpj = (value) => {
         : cleanedValue.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
 };
 
+
+const checkBusinessHours = async () => {
+    const agora = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+    const diaSemana = agora.getDay(); 
+    const hora = agora.getHours();
+    const minuto = agora.getMinutes();
+
+    const foraDiaUtil = (diaSemana === 0 || diaSemana === 6);
+    const antesDoInicio = hora < 8 || (hora === 8 && minuto < 30);
+    const depoisDoFim = hora > 17 || (hora === 17 && minuto > 30);
+    const foraHorario = antesDoInicio || depoisDoFim;
+
+
+    if (foraDiaUtil || foraHorario) {
+        msg = "Nosso atendimento funciona de segunda a sexta, das 08:30 às 17:30. Por favor, aguarde até o próximo horário de atendimento.";
+    } else {
+        msg = "Aguarde um momento, iremos te transferir para um dos nossos atendentes.";
+    }
+
+    await enviaMensagem(msg, contactId);
+};
+
+
 const pesquisasSql = async(pesquisa, tipo, sequelize) => {
     let filtro = '';
     let replacements = { pesquisa };
@@ -107,26 +130,19 @@ const pesquisasSql = async(pesquisa, tipo, sequelize) => {
 }
 
 
-const validaCpfParaTroca = async (cpf_cnpj, sequelize, contactId) => {
-    const result = await pesquisasSql(cpf_cnpj, 'cpf_cnpj', sequelize);
+const validaParaTroca = async (valor, sequelize, contactId, type = 'cpf_cnpj') => {
+    const result = await pesquisasSql(valor, tipo, sequelize);
 
-    if (result === "cpf_invalido") return { flag: "cpf_invalido", message: "CPF/CNPJ inválido" };
-    
-    if (!result.length) return { flag: 'registro_nao_encontrado_troca', message: 'Nenhum registro encontrado' };
-    
-
-    return await processaValidacaoTroca(result, contactId);
-};
-
-
-const validaPedidoParaTroca = async (pedido, sequelize, contactId) => {
-
-    const result=  await pesquisasSql(pedido, 'pedido', sequelize);
+    if (type === 'cpf_cnpj') {
+        if (result === "cpf_invalido") {
+            return { flag: "cpf_invalido", message: "CPF/CNPJ inválido" };
+        }
+    }
 
     if (!result.length) {
-        
-        if (pedido.startsWith('20000')) return { flag: 'registro_nao_encontrado_meli', message: 'Nenhum registro encontrado' };
-
+        if (type === 'pedido' && valor.startsWith('20000')) {
+            return { flag: 'registro_nao_encontrado_meli', message: 'Nenhum registro encontrado' };
+        }
         return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
     }
 
@@ -143,34 +159,7 @@ const processaValidacaoTroca = async (result, contactId) => {
     }
     await enviaMensagem(msg, contactId);
 
-    const agora = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
-    const diaSemana = agora.getDay(); 
-    const hora = agora.getHours();
-    const minuto = agora.getMinutes();
-
-    const foraDiaUtil = (diaSemana === 0 || diaSemana === 6);
-    const antesDoInicio = hora < 8 || (hora === 8 && minuto < 30);
-    const depoisDoFim = hora > 17 || (hora === 17 && minuto > 30);
-    const foraHorario = antesDoInicio || depoisDoFim;
-
-    const dia = agora.getDate();
-    const mes = agora.getMonth() + 1; // Janeiro é 0
-
-    const feriadoAbril = mes === 4 && dia >= 18 && dia <= 21;
-
-    if (feriadoAbril) {
-        msg = "Informamos que no período de 18/04/25 à 21/04/25 não haverá expediente devido aos feriados nacionais e final de semana.\n";
-        msg += "Assim que retornarmos no dia 22/04/25 responderemos por ordem de envio das mensagens.\n";
-        msg += "Não é necessário enviar mais de uma mensagem sobre o mesmo assunto, pois dessa forma evitará que você seja direcionado ao final da fila.\n";
-        msg += "Agradecemos a compreensão e em breve, retornaremos!\n";
-    } else if (foraDiaUtil || foraHorario) {
-        msg = "Nosso atendimento funciona de segunda a sexta, das 08:30 às 17:30. Por favor, aguarde até o próximo horário de atendimento.";
-    } else {
-        msg = "Aguarde um momento, iremos te transferir para um dos nossos atendentes.";
-    }
-
-
-    await enviaMensagem(msg, contactId);
+    await checkBusinessHours(contactId)
 
     const flag = (portal === "Mercado Livre" || pedido.startsWith("20000")) 
         ? "encaminha_troca_meli" 
@@ -180,9 +169,18 @@ const processaValidacaoTroca = async (result, contactId) => {
 };
 
 
+const enviaNFE = async (cpf_cnpj, sequelize, contactId, type = 'cpf_cnpj') => {
+    const result = await pesquisasSql(cpf_cnpj, type, sequelize)
+    
+    if (result === "cpf_invalido") return { flag: "cpf_invalido", message: "CPF/CNPJ inválido" };
 
-const enviaNFE = async (sequelize, contactId, result) => {
-  
+    if (!result.length) {
+        const flag = pedido.startsWith('20000') 
+            ? 'registro_nao_encontrado_meli' 
+            : 'registro_nao_encontrado';
+        return { flag, message: 'Nenhum registro encontrado' };
+    }
+
     const chaveNfe = result[0].chavenfe;
     const msg = `Para acessar sua NFE, acesse: \n https://www.nfe.fazenda.gov.br/portal/consultaRecaptcha.aspx?tipoConsulta=resumo&tipoConteudo=7PhJ+gAVw2g= \ne insira a seguinte chave :`;
 
@@ -192,40 +190,14 @@ const enviaNFE = async (sequelize, contactId, result) => {
     return { flag: 'nfe_enviada', message: 'Nfe encontrada' };
 };
 
-const enviaNFEPeloPedido = async (pedido, sequelize, contactId) => {
 
-    const result = await pesquisasSql(pedido, 'pedido', sequelize);
+// Envia rastreio pelo cpf
+const enviaRastreio = async (cpf_cnpj, sequelize, contactId, type = 'cpf_cnpj') => {
 
-    if (!result.length) {
-        const flag = pedido.startsWith('20000') 
-            ? 'registro_nao_encontrado_meli' 
-            : 'registro_nao_encontrado';
-        return { flag, message: 'Nenhum registro encontrado' };
-    }
-
-    return enviaNFE(sequelize, contactId, result);
-};
-
-
-// Envia NFE pelo CPF/CNPJ
-const enviaNFEPleoCpf = async (cpf_cnpj, sequelize, contactId) => {
-    const result = await pesquisasSql(cpf_cnpj, 'cpf_cnpj', sequelize)
-    
-    if (result === "cpf_invalido") return { flag: "cpf_invalido", message: "CPF/CNPJ inválido" };
-
-    if (!result.length) return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
-
-    return enviaNFE(sequelize, contactId, result);
-};
-
-
-const validaCpfCnpj = async (cpf_cnpj, sequelize, contactId) => {
-
-    const result = await pesquisasSql(cpf_cnpj, 'cpf_cnpj', sequelize)
+    const result = await pesquisasSql(cpf_cnpj, type, sequelize)
 
     if (result === "cpf_invalido") return { flag: "cpf_invalido", message: "CPF/CNPJ inválido" };
     if (!result.length)  return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
-    
 
     return await encontrou_pedido(result, contactId); // Aguarda o envio do rastreio
 
@@ -251,39 +223,7 @@ const encontrou_pedido = async (result, contactId) => {
 }
 
 
-const enviaRastreio = async (pedido, sequelize, contactId) => {
-
-    const result = await pesquisasSql(pedido, 'pedido', sequelize);
-
-    if (!result.length)  return { flag: 'registro_nao_encontrado', message: 'Nenhum registro encontrado' };
-
-    return await encontrou_pedido(result, contactId); 
-
-};
-
-
-// Valida pedido
-const validaPedido = async (pedido, sequelize, contactId) => {
-
-    const result = await pesquisasSql(pedido, 'pedido', sequelize);
-
-    if (!result.length || !result[0].intelipost_order) return { flag: 'pedido_nao_encontrado', message: 'Nenhum pedido encontrado' };
-
-    await enviaMensagem(`Seu pedido foi encontrado! Código: ${result[0].intelipost_order}`, contactId);
-
-    return { flag: 'pedido_encontrado', message: 'Encontrado' };
-
-};
-
-
 const validaEmailOutrosAssuntos = async (cpf_cnpj, sequelize, contactId) => {
-    const agora = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
-
-    const dia = agora.getDate();
-    const mes = agora.getMonth() + 1; // Janeiro é 0
-
-    const feriadoAbril = mes === 4 && dia >= 18 && dia <= 21;
-
     const result = await pesquisasSql(cpf_cnpj, 'cpf_cnpj', sequelize);
 
     if (result === "cpf_invalido") return { flag: "cpf_invalido_outros_assuntos", message: "CPF/CNPJ inválido" };
@@ -306,14 +246,7 @@ const validaEmailOutrosAssuntos = async (cpf_cnpj, sequelize, contactId) => {
     
     await enviaMensagem('Por gentileza, informe o motivo do seu chamado.', contactId);
 
-    if (feriadoAbril) {
-        msg = "Informamos que no período de 18/04/25 à 21/04/25 não haverá expediente devido aos feriados nacionais e final de semana.\n";
-        msg += "Assim que retornarmos no dia 22/04/25 responderemos por ordem de envio das mensagens.\n";
-        msg += "Não é necessário enviar mais de uma mensagem sobre o mesmo assunto, pois dessa forma evitará que você seja direcionado ao final da fila.\n";
-        msg += "Agradecemos a compreensão e em breve, retornaremos!\n";
-
-        await enviaMensagem(msg, contactId);
-    }
+  
 
     return { flag: 'cpf_valido_outros_assuntos', message: 'cpf válido' };
 };
@@ -348,13 +281,9 @@ const enviaMensagem = async (msg, contactId) => {
 };
 
 module.exports = { 
-    validaCpfCnpj, 
     enviaRastreio, 
-    validaPedido, 
     enviaMensagem,
-    enviaNFEPleoCpf, 
-    enviaNFEPeloPedido, 
-    validaCpfParaTroca, 
-    validaPedidoParaTroca, 
+    enviaNFE,
+    validaParaTroca,
     validaEmailOutrosAssuntos 
 };

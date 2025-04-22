@@ -5,13 +5,10 @@ const axios = require('axios'); // 📌 Importando Axios para fazer requisiçõe
 const sequelize = require('./database'); // Importa a instância do Sequelize
 require('dotenv').config(); // Carrega variáveis do .env
 const { pedidos_rastreio } = require('./service/rastreio'); // Importa a função de rastreio
-const { validaCpfCnpj, 
+const { 
     enviaRastreio, 
-    enviarRastreioPorCpf, 
-    enviaNFEPleoCpf, 
-    enviaNFEPeloPedido, 
-    validaCpfParaTroca, 
-    validaPedidoParaTroca, 
+    enviaNFE,
+    validaParaTroca,
     validaEmailOutrosAssuntos
 } = require('./webhook/webhook'); // Importa a função de rastreio
 
@@ -65,29 +62,22 @@ app.post('/api/webhook', async (req, res) => {
 
   switch (command) {
       case 'validaCpf':
-          response = await validaCpfCnpj(message.text, sequelize, contactId);
+          response = await enviaRastreio(message.text, sequelize, contactId);
           break;
-
-      case 'enviaUrlRastreio': 
-            response = await enviarRastreioPorCpf(message.text, sequelize, contactId);
-              break;
-      case 'validaPedido':
-            response = await validaPedido(message.text, sequelize, contactId);
-            break;
       case 'rastreioPeloPedido':
-            response = await enviaRastreio(message.text, sequelize, contactId);
+            response = await enviaRastreio(message.text, sequelize, contactId, 'pedido');
             break;
       case 'nfePeloPedido':
-            response = await enviaNFEPeloPedido(message.text, sequelize, contactId);
+            response = await enviaNFE(message.text, sequelize, contactId, 'pedido');
             break;
       case 'enviaNFECliente':
-            response = await enviaNFEPleoCpf(message.text, sequelize, contactId);
+            response = await enviaNFE(message.text, sequelize, contactId);
             break;
       case 'validaCpfParaTroca':
-            response = await validaCpfParaTroca(message.text, sequelize, contactId);
+            response = await validaParaTroca(message.text, sequelize, contactId);
             break;
       case 'validaPedidoParaTroca':
-            response = await validaPedidoParaTroca(message.text, sequelize, contactId);
+            response = await validaParaTroca(message.text, sequelize, contactId, 'pedido');
             break;
       case 'validaEmailOutrosAssuntos':
             response = await validaEmailOutrosAssuntos(message.text, sequelize, contactId);
