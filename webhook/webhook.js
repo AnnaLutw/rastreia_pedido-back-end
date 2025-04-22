@@ -175,7 +175,7 @@ const enviaNFE = async (cpf_cnpj, sequelize, contactId, type = 'cpf_cnpj') => {
     if (result === "cpf_invalido") return { flag: "cpf_invalido", message: "CPF/CNPJ inválido" };
 
     if (!result.length) {
-        const flag = pedido.startsWith('20000') 
+        const flag = cpf_cnpj.startsWith('20000') 
             ? 'registro_nao_encontrado_meli' 
             : 'registro_nao_encontrado';
         return { flag, message: 'Nenhum registro encontrado' };
