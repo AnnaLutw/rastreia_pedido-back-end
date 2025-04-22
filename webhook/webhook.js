@@ -53,7 +53,7 @@ const formatCpfCnpj = (value) => {
 };
 
 
-const checkBusinessHours = async () => {
+const checkBusinessHours = async (contactId) => {
     const agora = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
     const diaSemana = agora.getDay(); 
     const hora = agora.getHours();
@@ -92,9 +92,17 @@ const pesquisasSql = async(pesquisa, tipo, sequelize) => {
     if (tipo === 'email')  filtro = `AND c.email = :pesquisa`;
 
     
-
     const result = await sequelize.query(
-        `SELECT ns.chavenfe,
+        `WITH ultimos_eventos AS (
+            SELECT 
+                er1.id_nota_saida,
+                er1.evento,
+                er1.dthr_atualizacao,
+                ROW_NUMBER() OVER (PARTITION BY er1.id_nota_saida ORDER BY er1.dthr_atualizacao DESC) AS rn
+            FROM sysemp.entrega_rastreio er1
+        )
+        SELECT 
+            ns.chavenfe,
             ns.marketplace_pedido AS pedido,
             c.email,
             c.razsocial, 
@@ -108,18 +116,9 @@ const pesquisasSql = async(pesquisa, tipo, sequelize) => {
             ns.transportadora_ecommerce 
         FROM sysemp.nota_saida ns
         JOIN sysemp.cliente c ON c.id_cliente = ns.id_cliente
-        JOIN (
-            SELECT er1.*
-            FROM sysemp.entrega_rastreio er1
-            JOIN (
-                SELECT id_nota_saida, MAX(dthr_atualizacao) AS max_dth
-                FROM sysemp.entrega_rastreio
-                GROUP BY id_nota_saida
-            ) latest ON er1.id_nota_saida = latest.id_nota_saida 
-                    AND er1.dthr_atualizacao = latest.max_dth
-        ) er ON er.id_nota_saida = ns.id_nota_saida
-             AND ns.transportadora_ecommerce <> 'ENVVIAS NOR'
-        WHERE ns.chavenfe <> ''
+        JOIN ultimos_eventos er ON er.id_nota_saida = ns.id_nota_saida AND er.rn = 1
+        WHERE ns.transportadora_ecommerce <> 'ENVVIAS NOR'
+        AND ns.chavenfe <> ''
         ${filtro}`,
         {
             type: sequelize.QueryTypes.SELECT,
