@@ -131,7 +131,7 @@ const pesquisasSql = async(pesquisa, tipo, sequelize) => {
 
 
 const validaParaTroca = async (valor, sequelize, contactId, type = 'cpf_cnpj') => {
-    const result = await pesquisasSql(valor, tipo, sequelize);
+    const result = await pesquisasSql(valor, type, sequelize);
 
     if (type === 'cpf_cnpj') {
         if (result === "cpf_invalido") {
