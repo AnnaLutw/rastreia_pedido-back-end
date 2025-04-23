@@ -54,15 +54,15 @@ const formatCpfCnpj = (value) => {
 
 
 const checkBusinessHours = async (contactId) => {
-    const agora = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+    const agora     = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
     const diaSemana = agora.getDay(); 
-    const hora = agora.getHours();
-    const minuto = agora.getMinutes();
+    const hora      = agora.getHours();
+    const minuto    = agora.getMinutes();
 
-    const foraDiaUtil = (diaSemana === 0 || diaSemana === 6);
+    const foraDiaUtil   = (diaSemana === 0 || diaSemana === 6);
     const antesDoInicio = hora < 8 || (hora === 8 && minuto < 30);
-    const depoisDoFim = hora > 17 || (hora === 17 && minuto > 30);
-    const foraHorario = antesDoInicio || depoisDoFim;
+    const depoisDoFim   = hora > 17 || (hora === 17 && minuto > 30);
+    const foraHorario   = antesDoInicio || depoisDoFim;
 
 
     if (foraDiaUtil || foraHorario) {
@@ -213,7 +213,10 @@ const encontrou_pedido = async (result, contactId) => {
         rastreioUrl = 'https://vvlog.uxdelivery.com.br/tracking'
     }
 
-    const msg = `Encontramos seu pedido do *${portal}*\nPedido: ${pedido}\nStatus Atual: ${evento} \n\nO link de rastreio é:\n${rastreioUrl}`;
+    let msg = `Encontramos seu pedido do *${portal}*\nPedido: ${pedido}\nStatus Atual: ${evento} \n\nO link de rastreio é:\n${rastreioUrl}`;
+    if(evento == 'SAIU PARA ENTREGA'){
+         msg += `\n\nOBS: Não necessariamente será entregue no mesmo dia`
+    }
 
     await enviaMensagem(msg, contactId);
 
